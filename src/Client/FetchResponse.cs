@@ -22,11 +22,11 @@ namespace ApiTools.Net
 	{
 		public FetchResponse(int responseStatusCode, string responseBody)
 		{
-			this.responseStatusCode = responseStatusCode;
-			this.responseBody = responseBody;
+			this.Code = responseStatusCode;
+			this.Body = responseBody;
 		}
 		
-		public int responseStatusCode { get; private set; }
-		public string responseBody { get; private set; }
+		public int Code { get; private set; }
+		public string Body { get; private set; }
 	}
 }
