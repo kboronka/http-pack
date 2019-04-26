@@ -33,8 +33,9 @@ public static int CreatePost(Post post, string auth)
 	var req = new JsonKeyValuePairs();
 	req.Add("body", post);
 	
+	var uri = "https://jsonplaceholder.typicode.com/posts";
 	var client = new RestClient();
-	var res = client.Fetch("https://jsonplaceholder.typicode.com/posts", WebRequestMethods.Http.Post, req, auth);
+	var res = client.Fetch(uri, WebRequestMethods.Http.Post, req, auth);
 	
 	if (res.Code == 201)	// 201 = Created
 	{
