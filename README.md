@@ -1,5 +1,5 @@
 # api-tools
-A collection of Http Client, Json, and Auth classes for C# apps
+A C# library of http-client, json, and authorization classes
 
 ## Example
 ```C#
