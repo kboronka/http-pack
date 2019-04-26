@@ -3,11 +3,6 @@ A C# library of http-client, json, and authorization classes
 
 ## Example
 ```C#
-/// <summary>
-/// HTTP GET example
-/// </summary>
-/// <param name="id"></param>
-/// <returns></returns>
 public static JsonKeyValuePairs GetPost(int id)
 {
 	var uri = string.Format("https://jsonplaceholder.typicode.com/posts/{0}", id);
@@ -23,11 +18,6 @@ public static JsonKeyValuePairs GetPost(int id)
 	return null;
 }
 
-/// <summary>
-/// HTTP POST example
-/// </summary>
-/// <param name="post"></param>
-/// <returns></returns>
 public static int CreatePost(Post post, string auth)
 {
 	var req = new JsonKeyValuePairs();
