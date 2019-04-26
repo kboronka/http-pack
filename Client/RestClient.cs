@@ -21,7 +21,7 @@ using System.Net;
 
 using ApiTools.Json;
 
-namespace ApiTools
+namespace ApiTools.Net
 {
 	public class RestClient
 	{

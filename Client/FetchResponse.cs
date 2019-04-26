@@ -16,7 +16,7 @@
 using System;
 using System.Linq;
 
-namespace ApiTools
+namespace ApiTools.Net
 {
 	public class FetchResponse
 	{
