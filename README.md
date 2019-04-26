@@ -1,10 +1,52 @@
 # api-tools
 A collection of Http Client, Json, and Auth classes for C# apps
 
-## Rest API call
+## Example
+```C#
+/// <summary>
+/// HTTP GET example
+/// </summary>
+/// <param name="id"></param>
+/// <returns></returns>
+public static JsonKeyValuePairs GetPost(int id)
+{
+	var uri = string.Format("https://jsonplaceholder.typicode.com/posts/{0}", id);
+	
+	var client = new RestClient();
+	var res = client.Fetch(uri);
+	
+	if (res.Code == 200)
+	{
+		return new JsonKeyValuePairs(res.Body);
+	}
+	
+	return null;
+}
 
-
-## Json Parsing
+/// <summary>
+/// HTTP POST example
+/// </summary>
+/// <param name="post"></param>
+/// <returns></returns>
+public static int CreatePost(Post post, string auth)
+{
+	var req = new JsonKeyValuePairs();
+	req.Add("body", post);
+	
+	var client = new RestClient();
+	var res = client.Fetch("https://jsonplaceholder.typicode.com/posts", WebRequestMethods.Http.Post, req, auth);
+	
+	if (res.Code == 201)	// 201 = Created
+	{
+		var kvp = new JsonKeyValuePairs(res.Body);
+		return (int)kvp["id"];
+	}
+	else
+	{
+		return -1;
+	}
+}
+```
 
 
 ## dev environment

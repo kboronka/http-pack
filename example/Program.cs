@@ -10,50 +10,59 @@ namespace example
 	{
 		public static void Main(string[] args)
 		{
+			var postOne = GetPost(1);
+			Console.WriteLine(postOne.Stringify());
+			
+			var newPost = new Post("foo", "bar", 1);
+			var postID = CreatePost(newPost, "");
+			Console.WriteLine(String.Format("new post id: {0}", postID));
+						
+			Console.Write("Press any key to continue . . . ");
+			Console.ReadKey(true);
+		}
+		
+		/// <summary>
+		/// HTTP GET example
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		public static JsonKeyValuePairs GetPost(int id)
+		{
+			var uri = string.Format("https://jsonplaceholder.typicode.com/posts/{0}", id);
+			
 			var client = new RestClient();
-			
-			var uri = "https://jsonplaceholder.typicode.com/posts/1";
-			Console.WriteLine("HTTP GET " + uri);
 			var res = client.Fetch(uri);
-			
-			Console.WriteLine(String.Format("Response Code: {0}", res.Code));
 			
 			if (res.Code == 200)
 			{
-				Console.WriteLine("Response:");
-				Console.WriteLine(res.Body);
+				return new JsonKeyValuePairs(res.Body);
 			}
 			
-			Console.WriteLine();
-			Console.WriteLine();
-			
-			uri = "https://jsonplaceholder.typicode.com/posts";
-			Console.WriteLine("HTTP POST " + uri);
-			var post = new Post("foo", "bar", 1);
+			return null;
+		}
+		
+		/// <summary>
+		/// HTTP POST example
+		/// </summary>
+		/// <param name="post"></param>
+		/// <returns></returns>
+		public static int CreatePost(Post post, string auth)
+		{
 			var req = new JsonKeyValuePairs();
-			var auth = "";
 			req.Add("body", post);
 			
-			res = client.Fetch(uri, WebRequestMethods.Http.Post, req, auth);
+			var client = new RestClient();
+			var res = client.Fetch("https://jsonplaceholder.typicode.com/posts", WebRequestMethods.Http.Post, req, auth);
 			
-			Console.WriteLine(String.Format("Response Code: {0}", res.Code));
 			if (res.Code == 201)	// 201 = Created
 			{
-				Console.WriteLine("response: " + res.Body);
+				var kvp = new JsonKeyValuePairs(res.Body);
+				return (int)kvp["id"];
 			}
 			else
 			{
-				Console.WriteLine("err: " + res.Body);
+				return -1;
 			}
-			
-			var kvp = new JsonKeyValuePairs(res.Body);
-			Console.WriteLine(string.Format("ID: {0}", kvp["id"]));
-			
-			
-			Console.WriteLine();
-			Console.WriteLine();
-			Console.Write("Press any key to continue . . . ");
-			Console.ReadKey(true);
 		}
 	}
 }

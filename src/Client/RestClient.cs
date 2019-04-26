@@ -58,7 +58,7 @@ namespace ApiTools.Net
 		
 		public FetchResponse Fetch(string url, string method, JsonKeyValuePairs kvp, string authorization)
 		{
-			return Fetch(url, method, kvp.ToJson(), authorization, "application/json");
+			return Fetch(url, method, kvp.Stringify(), authorization, "application/json");
 		}
 		
 		

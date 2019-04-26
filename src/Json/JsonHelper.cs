@@ -416,7 +416,7 @@ namespace ApiTools.Json
 		
 		public static string ToJson(this IJsonObject obj)
 		{
-			return obj.KeyValuePairs.ToJson();
+			return obj.KeyValuePairs.Stringify();
 		}
 		
 		public static string ToJson(this IEnumerable<IJsonObject> obj)
@@ -427,7 +427,7 @@ namespace ApiTools.Json
 			foreach (IJsonObject i in obj)
 			{
 				JSON += delimitor;
-				JSON += i.KeyValuePairs.ToJson();
+				JSON += i.KeyValuePairs.Stringify();
 				delimitor = ",";
 			}
 			
@@ -451,7 +451,7 @@ namespace ApiTools.Json
 			return JSON;
 		}
 		
-		public static string ToJson(this JsonKeyValuePairs kvp)
+		public static string Stringify(this JsonKeyValuePairs kvp)
 		{
 			var builder = new JsonBuilder();
 			builder.Render(kvp);

@@ -15,7 +15,7 @@ namespace ApiTools.Auth
 		{
 			var header = CreateJwtHeader();
 
-			var jwt = Base64UrlEncode(header.ToJson()) + "." + Base64UrlEncode(payload.ToJson());
+			var jwt = Base64UrlEncode(header.Stringify()) + "." + Base64UrlEncode(payload.Stringify());
 			jwt += "." + Sign(jwt, secret);
 
 			Token = jwt;
@@ -25,7 +25,7 @@ namespace ApiTools.Auth
 		{
 			var header = CreateJwtHeader();
 			
-			var jwt = Base64UrlEncode(header.ToJson()) + "." + Base64UrlEncode(payload.ToJson());
+			var jwt = Base64UrlEncode(header.Stringify()) + "." + Base64UrlEncode(payload.ToJson());
 			jwt += "." + Sign(jwt, secret);
 			
 			Token = jwt;
