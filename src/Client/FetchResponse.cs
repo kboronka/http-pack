@@ -16,7 +16,7 @@
 using System;
 using System.Linq;
 
-namespace ApiTools.Net
+namespace HttpPack.Net
 {
 	public class FetchResponse
 	{

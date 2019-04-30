@@ -16,7 +16,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ApiTools.Json
+namespace HttpPack.Json
 {
 	/// <summary>
 	/// Description of JsonArray.

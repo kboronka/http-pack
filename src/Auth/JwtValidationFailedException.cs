@@ -1,8 +1,8 @@
 ﻿using System;
 
-using ApiTools.Json;
+using HttpPack.Json;
 
-namespace ApiTools.Auth
+namespace HttpPack.Auth
 {
 	/// <summary>
 	/// Description of JwtValidationFailedException.

@@ -6,7 +6,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <OutputType>Library</OutputType>
-    <RootNamespace>ApiTools</RootNamespace>
+    <RootNamespace>HttpPack</RootNamespace>
     <AssemblyName>api-tools</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -54,7 +54,9 @@
       <DependentUpon>RestClient.cs</DependentUpon>
     </Compile>
     <Compile Include="Client\RestClient.cs" />
-    <Compile Include="Client\WebClientEx.cs" />
+    <Compile Include="Client\WebClientEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Json\IJsonObject.cs" />
     <Compile Include="Json\JsonArray.cs" />
     <Compile Include="Json\JsonBuilder.cs" />
@@ -65,11 +67,7 @@
     <Compile Include="Json\StringHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Client" />
-    <Folder Include="Json" />
-    <Folder Include="Auth" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <PostBuildEvent>xcopy /E /Y "$(TargetDir)$(TargetName).*" "$(SolutionDir)dist\*.*"</PostBuildEvent>

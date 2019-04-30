@@ -19,7 +19,7 @@ using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 
-namespace ApiTools.Net
+namespace HttpPack.Net
 {
 	public class WebClientEx : WebClient
 	{

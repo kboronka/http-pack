@@ -10,7 +10,7 @@ namespace sar.Tools
 {
 	
 }
-namespace ApiTools.Json
+namespace HttpPack.Json
 {
 	/// <summary>
 	/// Description of JsonBuilder.

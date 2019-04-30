@@ -20,7 +20,7 @@ using System.Text.RegularExpressions;
 
 using sar.Tools;
 
-namespace ApiTools.Json
+namespace HttpPack.Json
 {
 	public static class JsonHelper
 	{

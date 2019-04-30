@@ -18,7 +18,7 @@ using System.Collections.Generic;
 
 using sar.Tools;
 
-namespace ApiTools.Json
+namespace HttpPack.Json
 {
 	/// <summary>
 	/// Dictionary extension object.
@@ -140,7 +140,7 @@ namespace ApiTools.Json
 			}
 		}
 		
-		public void Add(string key, object value)
+		new public void Add(string key, object value)
 		{
 			if (!base.ContainsKey(key))
 			{

@@ -57,9 +57,9 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\api-tools.csproj">
+    <ProjectReference Include="..\src\http-pack.csproj">
       <Project>{2b0316b3-0564-427e-a0bb-f77e62b3ccc9}</Project>
-      <Name>ApiTools</Name>
+      <Name>HttpPack</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

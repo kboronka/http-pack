@@ -18,7 +18,7 @@ using System.Collections.Generic;
 
 using sar.Tools;
 
-namespace ApiTools.Json
+namespace HttpPack.Json
 {
 	/// <summary>
 	/// Description of JsonCollection.

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Net;
 
-using ApiTools.Net;
-using ApiTools.Json;
+using HttpPack.Net;
+using HttpPack.Json;
 
 namespace example
 {

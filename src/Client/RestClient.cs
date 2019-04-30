@@ -19,9 +19,9 @@ using System.Linq;
 using System.Text;
 using System.Net;
 
-using ApiTools.Json;
+using HttpPack.Json;
 
-namespace ApiTools.Net
+namespace HttpPack.Net
 {
 	public class RestClient
 	{

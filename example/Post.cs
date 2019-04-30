@@ -8,7 +8,7 @@
  */
 using System;
 
-using ApiTools.Json;
+using HttpPack.Json;
 
 namespace example
 {
