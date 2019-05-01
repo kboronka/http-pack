@@ -22,7 +22,7 @@ namespace example
             {
                 var kvp = new JsonKeyValuePairs(res.Body);
 
-                Console.WriteLine("TLS 1.1 -- " + uri);
+                Console.WriteLine("TLS Test -- " + uri);
                 Console.WriteLine("  TLS version: " + kvp["tls_version"]);
                 Console.WriteLine("  rating: " + kvp["rating"]);
 
