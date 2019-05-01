@@ -21,135 +21,134 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace HttpPack.Net
 {
-	public class WebClientEx : WebClient
-	{
-		private CookieContainer container = new CookieContainer();
+    public class WebClientEx : WebClient
+    {
+        private CookieContainer container = new CookieContainer();
 
-		public const int DefaultHttpTimeout = 100000;
+        public const int DefaultHttpTimeout = 100000;
 
-		public CookieContainer CookieContainer
-		{
-			get { return container; }
-			set { container = value; }
-		}
+        public CookieContainer CookieContainer
+        {
+            get { return container; }
+            set { container = value; }
+        }
 
-		public int Timeout { get; set; }
-		
-		public HttpStatusCode StatusCode { get; set; }
+        public int Timeout { get; set; }
 
-		public WebClientEx(CookieContainer container, int timeout = DefaultHttpTimeout)
-		{
-			this.container = container;
-			this.Timeout = timeout;
-			SetupCertificateSecurity();
-		}
+        public HttpStatusCode StatusCode { get; set; }
 
-		public WebClientEx(int timeout = DefaultHttpTimeout)
-		{
-			this.Timeout = timeout;
-			SetupCertificateSecurity();
-		}
-		
-		private void SetupCertificateSecurity()
-		{
-			ServicePointManager.ServerCertificateValidationCallback += ValidateRemoteCertificate;
-			ServicePointManager.SecurityProtocol = 
-				SecurityProtocolType.Tls | // TLS 1.0
-			(SecurityProtocolType)3072 |	// TLS 1.2
-			(SecurityProtocolType)768 | // TLS 1.1
-			SecurityProtocolType.Ssl3;
-			ServicePointManager.CertificatePolicy = new WebClientPolicy();
-		}
-		
-		private static bool ValidateRemoteCertificate(object sender, X509Certificate cert, X509Chain chain, SslPolicyErrors error)
-		{
-			// If the certificate is a valid, signed certificate, return true.
-			if (error == System.Net.Security.SslPolicyErrors.None)
-			{
-				return true;
-			}
-			
-			return false;
-		}
-		
-		public WebRequest GetWebRequestEx(Uri address)
-		{
-			return this.GetWebRequest(address);
-		}
+        public WebClientEx(CookieContainer container, int timeout = DefaultHttpTimeout)
+        {
+            this.container = container;
+            this.Timeout = timeout;
+            SetupCertificateSecurity();
+        }
 
-		protected override WebRequest GetWebRequest(Uri address)
-		{
-			WebRequest r = base.GetWebRequest(address);
-			var request = r as HttpWebRequest;
-			request.Timeout = this.Timeout;
-			if (request != null)
-			{
-				request.CookieContainer = container;
-			}
-			
-			return r;
-		}
+        public WebClientEx(int timeout = DefaultHttpTimeout)
+        {
+            this.Timeout = timeout;
+            SetupCertificateSecurity();
+        }
 
-		protected override WebResponse GetWebResponse(WebRequest request, IAsyncResult result)
-		{
-			request.Timeout = this.Timeout;
-			WebResponse response = base.GetWebResponse(request, result);
-			var httpResponse = (HttpWebResponse)response;
-			StatusCode = httpResponse.StatusCode;
-			ReadCookies(response);
-			return response;
-		}
+        private void SetupCertificateSecurity()
+        {
+            ServicePointManager.ServerCertificateValidationCallback += ValidateRemoteCertificate;
+            ServicePointManager.SecurityProtocol =
+                SecurityProtocolType.Tls |      // TLS 1.0
+            (SecurityProtocolType)3072 |        // TLS 1.2
+            (SecurityProtocolType)768 |         // TLS 1.1
+            SecurityProtocolType.Ssl3;
+  
+            ServicePointManager.ServerCertificateValidationCallback = OnValidateCertificate;
+            ServicePointManager.Expect100Continue = true;
+        }
 
-		protected override WebResponse GetWebResponse(WebRequest request)
-		{
-			request.Timeout = this.Timeout;
-			WebResponse response = base.GetWebResponse(request);
-			var httpResponse = (HttpWebResponse)response;
-			StatusCode = httpResponse.StatusCode;
-			ReadCookies(response);
-			return response;
-		}
+        private static bool ValidateRemoteCertificate(object sender, X509Certificate cert, X509Chain chain, SslPolicyErrors error)
+        {
+            // If the certificate is a valid, signed certificate, return true.
+            if (error == System.Net.Security.SslPolicyErrors.None)
+            {
+                return true;
+            }
 
-		private void ReadCookies(WebResponse r)
-		{
-			var response = r as HttpWebResponse;
-			if (response != null)
-			{
-				CookieCollection cookies = response.Cookies;
-				container.Add(cookies);
-			}
-		}
-		
-		public string Post(string path, string content)
-		{
-			var response = UploadString(path, content);
-			return response;
-		}
-		
-		public string Get(string path)
-		{
-			var response = DownloadString(path);
-			return response;
-		}
-		
-		public string Put(string path, string content)
-		{
-			var response = UploadString(path, "PUT", content);
-			return response;
-		}
-		
-		public string Delete(string path)
-		{
-			var response = UploadString(path, "DELETE", "");
-			return response;
-		}
-	}
-	
-	public class WebClientPolicy : ICertificatePolicy
-	{
-		public bool CheckValidationResult(ServicePoint srvPoint, X509Certificate cert, WebRequest request, int certificateProblem)
-		{
-			return true;
-		}
-	}
+            return false;
+        }
+
+        public WebRequest GetWebRequestEx(Uri address)
+        {
+            return this.GetWebRequest(address);
+        }
+
+        protected override WebRequest GetWebRequest(Uri address)
+        {
+            WebRequest r = base.GetWebRequest(address);
+            var request = r as HttpWebRequest;
+            request.Timeout = this.Timeout;
+            if (request != null)
+            {
+                request.CookieContainer = container;
+            }
+
+            return r;
+        }
+
+        protected override WebResponse GetWebResponse(WebRequest request, IAsyncResult result)
+        {
+            request.Timeout = this.Timeout;
+            WebResponse response = base.GetWebResponse(request, result);
+            var httpResponse = (HttpWebResponse)response;
+            StatusCode = httpResponse.StatusCode;
+            ReadCookies(response);
+            return response;
+        }
+
+        protected override WebResponse GetWebResponse(WebRequest request)
+        {
+            request.Timeout = this.Timeout;
+            WebResponse response = base.GetWebResponse(request);
+            var httpResponse = (HttpWebResponse)response;
+            StatusCode = httpResponse.StatusCode;
+            ReadCookies(response);
+            return response;
+        }
+
+        private void ReadCookies(WebResponse r)
+        {
+            var response = r as HttpWebResponse;
+            if (response != null)
+            {
+                CookieCollection cookies = response.Cookies;
+                container.Add(cookies);
+            }
+        }
+
+        public string Post(string path, string content)
+        {
+            var response = UploadString(path, content);
+            return response;
+        }
+
+        public string Get(string path)
+        {
+            var response = DownloadString(path);
+            return response;
+        }
+
+        public string Put(string path, string content)
+        {
+            var response = UploadString(path, "PUT", content);
+            return response;
+        }
+
+        public string Delete(string path)
+        {
+            var response = UploadString(path, "DELETE", "");
+            return response;
+        }
+        private static bool OnValidateCertificate(object sender, X509Certificate certificate, X509Chain chain,
+                                                  SslPolicyErrors sslPolicyErrors)
+        {
+            return true;
+        }
+    }
 }
