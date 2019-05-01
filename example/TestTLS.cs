@@ -31,7 +31,5 @@ namespace example
 
             return false;
         }
-        
-
     }
 }
