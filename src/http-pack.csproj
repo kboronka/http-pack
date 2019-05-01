@@ -7,7 +7,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <OutputType>Library</OutputType>
     <RootNamespace>HttpPack</RootNamespace>
-    <AssemblyName>api-tools</AssemblyName>
+    <AssemblyName>http-pack</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <TargetFrameworkProfile />
