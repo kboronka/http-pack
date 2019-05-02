@@ -19,9 +19,11 @@ class SampleController
 {
     public static HttpContent JsonContentSample(HttpRequest request)
     {
-        var json = new JsonKeyValuePairs();
-        json.Add("testString", "test");
-        json.Add("testInt", 1234);
+        var json = new JsonKeyValuePairs
+        {
+            { "my-string", "test" },
+            { "my-number", 1234 }
+        };
 
         return new HttpJsonContent(json);
     }
