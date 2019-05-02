@@ -591,9 +591,8 @@ namespace HttpPack.Server
 				{".svg", "image/svg+xml"},
 				{".woff", "application/font-woff"},
 				{".woff2", "application/font-woff2"},
-				{".json", "text/plain"}
+				{".json", "application/json"}
 
-				// {".json", "application/json"}
 				#endregion
 
 			};

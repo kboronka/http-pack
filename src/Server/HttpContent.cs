@@ -30,22 +30,16 @@ namespace HttpPack.Server
 		public HttpErrorContent(Exception ex) : base()
 		{
 			Exception inner = ExceptionHelper.GetInner(ex);
-			string message = inner.Message;
-			
-			message = inner.Message;
-			message += Environment.NewLine;
-			message += ExceptionHelper.GetStackTrace(inner);
-			
-			this.content = GetBytes(message);
+
+            var json = new JsonKeyValuePairs();
+            json.Add("message", inner.Message);
+            json.Add("stackTrace", ExceptionHelper.GetStackTrace(inner));
+
+            var body = json.Stringify();
+
+            this.content = Encoding.UTF8.GetBytes(body);
 			this.ContentType = "application/json";
 		}
-
-        private static byte[] GetBytes(string input)
-        {
-            var bytes = new byte[input.Length * sizeof(char)];
-            System.Buffer.BlockCopy(input.ToCharArray(), 0, bytes, 0, bytes.Length);
-            return bytes;
-        }
     }
 	
 	public class HttpContent
@@ -204,3 +198,4 @@ namespace HttpPack.Server
 		
 	}
 }
+
