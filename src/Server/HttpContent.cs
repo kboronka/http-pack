@@ -16,32 +16,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
 using HttpPack.Json;
-using HttpPack.Fsm;
 
 namespace HttpPack.Server
 {
-	public class HttpErrorContent : HttpContent
-	{
-		public HttpErrorContent(Exception ex) : base()
-		{
-			Exception inner = ExceptionHelper.GetInner(ex);
-
-            var json = new JsonKeyValuePairs();
-            json.Add("message", inner.Message);
-            json.Add("stackTrace", ExceptionHelper.GetStackTrace(inner));
-
-            var body = json.Stringify();
-
-            this.content = Encoding.UTF8.GetBytes(body);
-			this.ContentType = "application/json";
-		}
-    }
-	
 	public class HttpContent
 	{
 		#region static
