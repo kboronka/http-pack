@@ -21,9 +21,8 @@ using System.Reflection;
 using System.Threading;
 
 using HttpPack.Json;
-using sar.Tools;
 
-namespace sar.Http
+namespace HttpPack.Server
 {
 	public abstract class HttpWebSocket
 	{

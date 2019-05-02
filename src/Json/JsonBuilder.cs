@@ -5,11 +5,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Globalization;
 
-using sar.Tools;
-namespace sar.Tools
-{
-	
-}
 namespace HttpPack.Json
 {
 	/// <summary>

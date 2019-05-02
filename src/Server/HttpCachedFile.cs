@@ -22,9 +22,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 
-using sar.Tools;
-
-namespace sar.Http
+namespace HttpPack.Server
 {
 	public class HttpCachedFile
 	{

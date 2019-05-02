@@ -22,9 +22,8 @@ using System.Text.RegularExpressions;
 
 using HttpPack.Json;
 using HttpPack.Fsm;
-using sar.Tools;
 
-namespace sar.Http
+namespace HttpPack.Server
 {
 	public class HttpErrorContent : HttpContent
 	{
@@ -83,7 +82,7 @@ namespace sar.Http
 			}
 			else if (filePath.EndsWith("favicon.ico"))
 			{
-				return new HttpContent(server.Cache.Get("sar.http.libs.art.favicon.ico"), baseContent);
+				return new HttpContent(server.Cache.Get("HttpPack.Server.libs.art.favicon.ico"), baseContent);
 			}
 			else
 			{

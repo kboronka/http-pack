@@ -20,7 +20,7 @@ using System.Threading;
 using HttpPack.Json;
 using HttpPack.Fsm;
 
-namespace sar.FSM
+namespace HttpPack.Fsm
 {
 	/// <summary>
 	/// Description of Message.

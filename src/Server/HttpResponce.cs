@@ -20,9 +20,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Text;
 
-using sar.Tools;
-
-namespace sar.Http
+namespace HttpPack.Server
 {
 	// http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 	public enum HttpStatusCode

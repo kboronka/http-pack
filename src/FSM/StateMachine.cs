@@ -16,7 +16,7 @@
 using System;
 using System.Threading;
 
-namespace sar.FSM
+namespace HttpPack.Fsm
 {
 	/// <summary>
 	/// Description of StateMachine.

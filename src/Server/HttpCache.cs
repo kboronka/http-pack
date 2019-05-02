@@ -18,9 +18,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using sar.Tools;
-
-namespace sar.Http
+namespace HttpPack.Server
 {
     public class HttpCache
     {

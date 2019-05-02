@@ -15,7 +15,7 @@
 
 using System;
 
-namespace sar.Http
+namespace HttpPack.Server
 {
 	public class HttpView
 	{

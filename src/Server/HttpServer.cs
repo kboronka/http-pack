@@ -21,9 +21,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Reflection;
 
-using sar.Tools;
-
-namespace sar.Http
+namespace HttpPack.Server
 {
     public class HttpServer : HttpBase
     {

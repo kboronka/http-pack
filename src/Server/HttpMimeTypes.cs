@@ -16,7 +16,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace sar.Http
+namespace HttpPack.Server
 {
 	/// <summary>
 	/// Description of HttpMimeTypes.

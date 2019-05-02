@@ -15,7 +15,7 @@
 
 using System;
 
-namespace sar.FSM
+namespace HttpPack.Fsm
 {
 	/// <summary>
 	/// Description of Command.

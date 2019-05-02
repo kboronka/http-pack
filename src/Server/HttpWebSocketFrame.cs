@@ -15,9 +15,7 @@
 
 using System;
 
-using sar.Tools;
-
-namespace sar.Http
+namespace HttpPack.Server
 {
 	// base frame protocol
 	// http://tools.ietf.org/html/rfc6455#section-5.1

@@ -16,8 +16,6 @@
 using System;
 using System.Collections.Generic;
 
-using sar.Tools;
-
 namespace HttpPack.Json
 {
 	/// <summary>

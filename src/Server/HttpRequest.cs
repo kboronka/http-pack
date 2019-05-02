@@ -22,7 +22,7 @@ using System.Threading;
 
 using HttpPack.Json;
 
-namespace sar.Http
+namespace HttpPack.Server
 {
 	public enum HttpMethod
 	{

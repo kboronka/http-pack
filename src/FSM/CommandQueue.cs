@@ -17,7 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace sar.FSM
+namespace HttpPack.Fsm
 {
 	/// <summary>
 	/// Description of CommandQueue.
