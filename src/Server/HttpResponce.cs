@@ -74,7 +74,7 @@ namespace HttpPack.Server
 					this.content = HttpContent.Read(this.request.Server, this.request.Path);
 				}
 				
-				if (this.content is HttpErrorContent)
+				if (this.content is ExceptionHttpContent)
 				{
 					this.bytes = this.ConstructResponse(HttpStatusCode.SERVERERROR);
 				}
@@ -93,12 +93,12 @@ namespace HttpPack.Server
 			}
 			catch (FileNotFoundException ex)
 			{
-                this.content = new HttpErrorContent(ex);
+                this.content = new ExceptionHttpContent(ex);
 				this.bytes = this.ConstructResponse(HttpStatusCode.SERVERERROR);
 			}
 			catch (Exception ex)
 			{
-				this.content = new HttpErrorContent(ex);
+				this.content = new ExceptionHttpContent(ex);
                 this.bytes = this.ConstructResponse(HttpStatusCode.SERVERERROR);
 			}
 		}
