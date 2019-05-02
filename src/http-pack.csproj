@@ -73,12 +73,14 @@
     <Compile Include="Json\JsonKeyValuePairs.cs" />
     <Compile Include="Json\StringHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Server\HttpExceptionContent.cs" />
     <Compile Include="Server\HttpBase.cs" />
     <Compile Include="Server\HttpCache.cs" />
     <Compile Include="Server\HttpCachedFile.cs" />
     <Compile Include="Server\HttpConnection.cs" />
     <Compile Include="Server\HttpContent.cs" />
     <Compile Include="Server\HttpController.cs" />
+    <Compile Include="Server\HttpJsonContent.cs" />
     <Compile Include="Server\HttpMimeTypes.cs" />
     <Compile Include="Server\HttpRequest.cs" />
     <Compile Include="Server\HttpResponce.cs" />
