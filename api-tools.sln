@@ -1,12 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-# SharpDevelop 5.1
-VisualStudioVersion = 12.0.20827.3
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpPack", "src\http-pack.csproj", "{2B0316B3-0564-427E-A0BB-F77E62B3CCC9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "http-pack", "src\http-pack.csproj", "{2B0316B3-0564-427E-A0BB-F77E62B3CCC9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "example", "example\example.csproj", "{620B244F-6903-4FC3-BAC4-7DE4D85F83DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sar", "sar-tool\sar.csproj", "{74862D71-2342-4EAE-8C29-D25F2A195677}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,5 +23,15 @@ Global
 		{620B244F-6903-4FC3-BAC4-7DE4D85F83DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{620B244F-6903-4FC3-BAC4-7DE4D85F83DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{620B244F-6903-4FC3-BAC4-7DE4D85F83DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74862D71-2342-4EAE-8C29-D25F2A195677}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74862D71-2342-4EAE-8C29-D25F2A195677}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74862D71-2342-4EAE-8C29-D25F2A195677}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74862D71-2342-4EAE-8C29-D25F2A195677}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {85689C2A-A9EE-48B9-9B1C-64774129092F}
 	EndGlobalSection
 EndGlobal
