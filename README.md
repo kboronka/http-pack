@@ -14,11 +14,9 @@ public static void Main(string[] args)
 
 ## Example Server Controller
 ```C#
-[IsPrimaryController]
 [IsController]
 class SampleController
 {
-    [IsPrimaryAction]
     public static HttpContent JsonContentSample(HttpRequest request)
     {
         var json = new JsonKeyValuePairs();
