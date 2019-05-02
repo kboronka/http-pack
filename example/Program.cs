@@ -7,7 +7,7 @@ namespace example
 {
     class Program
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
             TestTLS.TLS11();
             TestBasics.Basics();

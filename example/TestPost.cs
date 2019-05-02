@@ -52,8 +52,10 @@ namespace example
         /// <returns></returns>
         private static int HttpPost(Post post, string auth)
         {
-            var req = new JsonKeyValuePairs();
-            req.Add("body", post);
+            var req = new JsonKeyValuePairs
+            {
+                { "body", post }
+            };
 
             var uri = "https://jsonplaceholder.typicode.com/posts";
             Console.WriteLine("");

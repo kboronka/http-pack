@@ -96,9 +96,9 @@ namespace HttpPack.Server
 		
 		#endregion
 		
-		private Type type;
-		private MethodInfo primaryAction;
-		private Dictionary<string, MethodInfo> actions;
+		private readonly Type type;
+		private readonly MethodInfo primaryAction;
+		private readonly Dictionary<string, MethodInfo> actions;
 		
 		public string FullName
 		{
