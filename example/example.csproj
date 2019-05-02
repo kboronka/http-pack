@@ -49,6 +49,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SampleController.cs" />
     <Compile Include="TestPost.cs" />
     <Compile Include="TestTLS.cs" />
     <Compile Include="Post.cs" />

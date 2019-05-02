@@ -41,7 +41,7 @@ namespace HttpPack.Server
 					{
 						foreach (object attribute in type.GetCustomAttributes(false))
 						{
-							if (attribute is SarController)
+							if (attribute is IsController)
 							{
 								// add the sar controller
 								string controllerName = type.Name.Substring(0, type.Name.Length - "Controller".Length);
@@ -122,7 +122,7 @@ namespace HttpPack.Server
 			
 			foreach (object obj in controller.GetCustomAttributes(false))
 			{
-				if (obj is PrimaryController) HttpController.primary = this;
+				if (obj is IsPrimaryController) HttpController.primary = this;
 			}
 			
 			foreach (MethodInfo method in controller.GetMethods())
@@ -132,7 +132,7 @@ namespace HttpPack.Server
 					this.actions.Add(method.Name, method);
 					foreach (object obj in method.GetCustomAttributes(false))
 					{
-						if (obj is PrimaryView) this.primaryAction = method;
+						if (obj is IsPrimaryAction) this.primaryAction = method;
 						if (obj is ViewAlias) this.actions.Add(((ViewAlias)obj).Alias, method);
 					}
 				}
@@ -141,7 +141,7 @@ namespace HttpPack.Server
 	}
 
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-	public class PrimaryView : Attribute { }
+	public class IsPrimaryAction : Attribute { }
 
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 	public class ViewAlias : Attribute
@@ -155,8 +155,8 @@ namespace HttpPack.Server
 	}
 	
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-	public class PrimaryController : Attribute { }
+	public class IsPrimaryController : Attribute { }
 
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-	public class SarController : Attribute { }
+	public class IsController : Attribute { }
 }
