@@ -46,15 +46,23 @@ namespace HttpPack.Server
             this.server = server;
 
             // read all files on root folder
-            foreach (var file in GetAllFiles(server.Root))
+            if (server.Root != null)
             {
-                var request = file.Substring(server.Root.Length + 1).ToLower();
-                cache.Add(request, new HttpCachedFile(file));
+                foreach (var file in GetAllFiles(server.Root))
+                {
+                    var request = file.Substring(server.Root.Length + 1).ToLower();
+                    cache.Add(request, new HttpCachedFile(file));
+                }
             }
         }
 
         public bool Contains(HttpRequest request)
         {
+            if (server.Root == null)
+            {
+                return false;
+            }
+
             var requestPath = request.Path;
             string filePath = Path.Combine(server.Root, requestPath.Replace(@"/", @"\"));
 
@@ -141,7 +149,7 @@ namespace HttpPack.Server
         private static List<string> GetAllDirectories(string root)
         {
             var directories = new List<string>();
-            
+
             if (Directory.Exists(root))
             {
                 directories.Add(root);

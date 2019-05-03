@@ -36,8 +36,10 @@ namespace HttpPack.Server
         {
             this.UserData = userData;
             this.port = port;
-            this.root = wwwroot;
-            this.root = Path.GetFullPath(this.root);
+            if (wwwroot != null)
+            {
+                this.root = Path.GetFullPath(wwwroot);
+            }
 
             var assembly = GetAssembly();
             this.Start(GetReferencedAssemblies(assembly));
@@ -45,7 +47,7 @@ namespace HttpPack.Server
 
         private void Start(List<Assembly> assemblies)
         {
-            if (!Directory.Exists(this.root))
+            if (this.root != null && !Directory.Exists(this.root))
             {
                 throw new DirectoryNotFoundException("root folder not found");
             }
