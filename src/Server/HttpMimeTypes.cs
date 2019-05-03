@@ -607,9 +607,7 @@ namespace HttpPack.Server
 				extension = "." + extension;
 			}
 
-			string mime;
-			
-			return mimeTypes.TryGetValue(extension, out mime) ? mime : "application/octet-stream";
-		}
+            return mimeTypes.TryGetValue(extension, out string mime) ? mime : "application/octet-stream";
+        }
 	}
 }
