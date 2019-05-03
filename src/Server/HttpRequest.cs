@@ -15,6 +15,7 @@
 
 using System;
 using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -33,8 +34,8 @@ namespace HttpPack.Server
 	
 	public class HttpRequest : HttpBase
 	{
-		private Encoding encoding;
-		private HttpServer parent;
+		private readonly Encoding encoding;
+		private readonly HttpServer parent;
 		private HttpMethod method;
 		private string fullUrl;
 		private string query;
@@ -52,14 +53,15 @@ namespace HttpPack.Server
 		
 		public HttpRequest(HttpConnection connection)
 		{
-			this.encoding = Encoding.ASCII;
+            this.encoding = Encoding.ASCII;
 			this.parent = connection.Parent;
 			this.UserData = connection.Parent.UserData;
 			this.RequestError = false;
-			this.ReadRequest(connection.Stream, connection.Socket);
-		}
-		
-		~HttpRequest()
+            this.RemoteEndpoint = ((IPEndPoint)connection.Socket.Client.RemoteEndPoint).Address.ToString();
+            this.ReadRequest(connection.Stream, connection.Socket);
+        }
+
+        ~HttpRequest()
 		{
 		}
 		
@@ -77,6 +79,8 @@ namespace HttpPack.Server
 		public string WebSocketKey { get; private set; }
 		public string WebSocketProtocol { get; private set; }
 		public object UserData { get; private set; }
+
+        public string RemoteEndpoint { get; private set; }
 
         public HttpMethod Method
 		{
