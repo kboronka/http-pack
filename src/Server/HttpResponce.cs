@@ -44,7 +44,7 @@ namespace HttpPack.Server
 	public class HttpResponse
 	{
 		private readonly HttpRequest request;
-		private HttpContent content;
+		private readonly HttpContent content;
 		public byte[] bytes;
 
 		public HttpResponse(HttpRequest request)

@@ -28,12 +28,12 @@ namespace HttpPack.Fsm
 	public class Message<T>
 	{
 		private readonly int timeout;
-		private object recivedLock = new object();
+		private readonly object recivedLock = new object();
 		
 		public bool Sent { get; set; }
 		public bool Recived { get; set; }
 		
-		private Thread timeoutThread;
+		private readonly Thread timeoutThread;
 		public bool Expired { get; private set; }
 
 		public T PayLoad { get; set; }

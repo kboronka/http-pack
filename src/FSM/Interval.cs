@@ -20,8 +20,8 @@ namespace HttpPack.Fsm
 {
 	public class Interval
 	{
-		private Stopwatch time;
-		private long setPoint;
+		private readonly Stopwatch time;
+		private readonly long setPoint;
 		private long lastTrigger;
 		private bool paused;
 		private long pauseStartTime;

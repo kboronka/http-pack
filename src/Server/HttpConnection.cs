@@ -31,9 +31,9 @@ namespace HttpPack.Server
 		public const int MAX_TIME = 300;
 		#endif
 		
-		private Thread serviceRequestThread;
-		private Thread timeoutMonitorThread;
-		private Interval timeout;
+		private readonly Thread serviceRequestThread;
+		private readonly Thread timeoutMonitorThread;
+		private readonly Interval timeout;
 
 		public bool Open { get; private set; }
 		public bool Stopped { get; private set; }
@@ -152,7 +152,7 @@ namespace HttpPack.Server
 			{
 				try
 				{
-					if (this.Socket.Connected && this.RequestReady())
+ 					if (this.Socket.Connected && this.RequestReady())
 					{
 						timeout.Reset();
 						

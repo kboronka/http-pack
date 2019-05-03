@@ -27,7 +27,7 @@ namespace HttpPack.Net
 	{
 		private WebClientEx client;
 		private const int TimeoutFallbackValue = 1000;	// 1 second
-		private int timeoutOverride;
+		private readonly int timeoutOverride;
 		
 		public RestClient(int timeoutOverride)
 		{

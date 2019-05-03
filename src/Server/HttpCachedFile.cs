@@ -36,7 +36,7 @@ namespace HttpPack.Server
 		protected bool embedded;
 		protected string path;
 		
-		private FileSystemWatcher watcher;
+		private readonly FileSystemWatcher watcher;
 		
 		#region constructors
 		

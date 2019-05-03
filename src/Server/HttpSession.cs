@@ -76,7 +76,7 @@ namespace HttpPack.Server
 
         #region service
 
-        private Thread expiryLoopThread;
+        private readonly Thread expiryLoopThread;
         private bool expiryLoopShutdown = false;
 
         private void ExpiryLoop()

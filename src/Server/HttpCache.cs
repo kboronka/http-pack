@@ -22,8 +22,8 @@ namespace HttpPack.Server
 {
     public class HttpCache
     {
-        private Dictionary<string, HttpCachedFile> cache;
-        private HttpServer server;
+        private readonly Dictionary<string, HttpCachedFile> cache;
+        private readonly HttpServer server;
 
         public List<string> Files
         {
