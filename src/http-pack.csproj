@@ -57,13 +57,13 @@
     <Compile Include="Client\WebClientEx.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="FSM\Command.cs" />
-    <Compile Include="FSM\CommandQueue.cs" />
-    <Compile Include="FSM\ExceptionHelper.cs" />
-    <Compile Include="FSM\Interval.cs" />
-    <Compile Include="FSM\Message.cs" />
-    <Compile Include="FSM\MessageQueue.cs" />
-    <Compile Include="FSM\StateMachine.cs" />
+    <Compile Include="Fsm\Command.cs" />
+    <Compile Include="Fsm\CommandQueue.cs" />
+    <Compile Include="Fsm\ExceptionHelper.cs" />
+    <Compile Include="Fsm\Interval.cs" />
+    <Compile Include="Fsm\Message.cs" />
+    <Compile Include="Fsm\MessageQueue.cs" />
+    <Compile Include="Fsm\StateMachine.cs" />
     <Compile Include="Json\IJsonObject.cs" />
     <Compile Include="Json\JsonArray.cs" />
     <Compile Include="Json\JsonBuilder.cs" />
