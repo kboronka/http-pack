@@ -45,7 +45,6 @@ namespace HttpPack.Server
 		// header
 		private int contentLength;
 		private int bytesRecived;
-		private bool pdfReader;
 		private string contentType;
 		private byte[] data;
 
@@ -122,11 +121,6 @@ namespace HttpPack.Server
 		public HttpServer Server
 		{
 			get { return parent; }
-		}
-		
-		public bool PdfReader
-		{
-			get { return pdfReader; }
 		}
 		
 		public bool RequestError { get; private set; }
@@ -298,7 +292,6 @@ namespace HttpPack.Server
 						this.bytesRecived = 0;
 						break;
 					case "user-agent":
-						this.pdfReader |= requestHeader[1].Contains("wkhtmltopdf");
 						break;
 					case "content-type":
 						this.contentType = requestHeader[1].TrimWhiteSpace();

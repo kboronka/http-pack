@@ -128,7 +128,6 @@ namespace HttpPack.Server
 				response += @"ETag: " + this.content.ETag + eol;
 				response += @"Set-Cookie: sarSession=" + this.request.Session.ID + @"; Path=/; expires=" + this.request.Session.ExpiryDate.ToString(GMT) + ";"	+ eol;
 				response += @"Last-Modified: " + this.content.LastModified.ToString(GMT) + eol;
-				if (this.request.PdfReader) response += "X-Content-Type-Options: " + "pdf-render" + eol;
 				
 				// content details
 				if (status != HttpStatusCode.NOT_MODIFIED)
