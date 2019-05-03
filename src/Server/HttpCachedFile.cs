@@ -66,12 +66,14 @@ namespace HttpPack.Server
 		public HttpCachedFile(string path) : this(path, File.ReadAllBytes(path))
 		{
 			this.LastModified = File.GetLastWriteTimeUtc(path);
-			
-			watcher = new FileSystemWatcher();
-            watcher.Path = Path.GetDirectoryName(path);
-			watcher.Filter = Path.GetFileName(path);
-			watcher.NotifyFilter = NotifyFilters.LastWrite;
-			watcher.Changed += new FileSystemEventHandler(OnChanged);
+
+            watcher = new FileSystemWatcher
+            {
+                Path = Path.GetDirectoryName(path),
+                Filter = Path.GetFileName(path),
+                NotifyFilter = NotifyFilters.LastWrite
+            };
+            watcher.Changed += new FileSystemEventHandler(OnChanged);
 			watcher.Deleted += new FileSystemEventHandler(OnDelete);
 			watcher.Renamed += new RenamedEventHandler(OnRenamed);
 			watcher.EnableRaisingEvents = true;

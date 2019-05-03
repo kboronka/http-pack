@@ -55,12 +55,14 @@ namespace HttpPack.Fsm
 			this.ResponseCallback = responseCallback;
 			this.TimeoutCallback = timeoutCallback;
 			this.timeout = timeout;
-			
-			timeoutThread = new Thread(TimeoutLoop);
-			timeoutThread.Name = "Message Timeout Thread";
-			timeoutThread.IsBackground = true;
-			timeoutThread.Priority = ThreadPriority.Lowest;
-			timeoutThread.Start();
+
+            timeoutThread = new Thread(TimeoutLoop)
+            {
+                Name = "Message Timeout Thread",
+                IsBackground = true,
+                Priority = ThreadPriority.Lowest
+            };
+            timeoutThread.Start();
 		}
 		
 		public void RequestSent()

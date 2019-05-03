@@ -41,9 +41,11 @@ namespace HttpPack.Server
             this.LastRequest = DateTime.Now;
             this.data = new Dictionary<string, object>();
 
-            this.expiryLoopThread = new Thread(this.ExpiryLoop);
-            this.expiryLoopThread.Name = "HttpSession " + this.ID;
-            this.expiryLoopThread.IsBackground = true;
+            this.expiryLoopThread = new Thread(this.ExpiryLoop)
+            {
+                Name = "HttpSession " + this.ID,
+                IsBackground = true
+            };
             this.expiryLoopThread.Start();
         }
 

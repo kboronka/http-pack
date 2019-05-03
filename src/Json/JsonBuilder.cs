@@ -18,10 +18,12 @@ namespace HttpPack.Json
 		public JsonBuilder()
 		{
 			builder = new StringBuilder();
-			
-			numberFormat = new NumberFormatInfo();
-			numberFormat.NumberDecimalSeparator = ".";
-		}
+
+            numberFormat = new NumberFormatInfo
+            {
+                NumberDecimalSeparator = "."
+            };
+        }
 		
 		public JsonBuilder Render(object value)
 		{

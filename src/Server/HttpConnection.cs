@@ -52,17 +52,21 @@ namespace HttpPack.Server
 
 			timeout = new Interval((MAX_TIME + 20) * 1000);
 			var clientIp = ((IPEndPoint)socket.Client.RemoteEndPoint).Address.ToString();
-			
-			this.serviceRequestThread = new Thread(this.MonitorTimeout);
-			this.serviceRequestThread.Name = "HttpConnection Service Request " + clientIp;
-			this.serviceRequestThread.IsBackground = true;
-			this.serviceRequestThread.Start();
-			
-			this.timeoutMonitorThread = new Thread(this.ServiceRequests);
-			this.timeoutMonitorThread.Name = "HttpConnection Timeout Monitor " + clientIp;
-			this.timeoutMonitorThread.Priority = ThreadPriority.Lowest;
-			this.timeoutMonitorThread.IsBackground = true;
-			this.timeoutMonitorThread.Start();
+
+            this.serviceRequestThread = new Thread(this.MonitorTimeout)
+            {
+                Name = "HttpConnection Service Request " + clientIp,
+                IsBackground = true
+            };
+            this.serviceRequestThread.Start();
+
+            this.timeoutMonitorThread = new Thread(this.ServiceRequests)
+            {
+                Name = "HttpConnection Timeout Monitor " + clientIp,
+                Priority = ThreadPriority.Lowest,
+                IsBackground = true
+            };
+            this.timeoutMonitorThread.Start();
 		}
 		
 		~HttpConnection()

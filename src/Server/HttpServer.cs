@@ -61,9 +61,11 @@ namespace HttpPack.Server
 
             this.connectionWaitHandle = new AutoResetEvent(false);
 
-            this.listenerLoopThread = new Thread(this.ListenerLoop);
-            this.listenerLoopThread.Name = "HttpServer Listener";
-            this.listenerLoopThread.IsBackground = true;
+            this.listenerLoopThread = new Thread(this.ListenerLoop)
+            {
+                Name = "HttpServer Listener",
+                IsBackground = true
+            };
             this.listenerLoopThread.Start();
         }
 
@@ -190,8 +192,10 @@ namespace HttpPack.Server
 
         private static List<Assembly> GetReferencedAssemblies(Assembly assembly)
         {
-            var assemblies = new List<Assembly>();
-            assemblies.Add(assembly);
+            var assemblies = new List<Assembly>
+            {
+                assembly
+            };
 
             foreach (AssemblyName assemblyName in assembly.GetReferencedAssemblies())
             {

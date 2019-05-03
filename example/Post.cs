@@ -32,11 +32,13 @@ namespace example
 		{
 			get
 			{
-				var kvp = new JsonKeyValuePairs();
-				kvp.Add("title", Title);
-				kvp.Add("body", Body);
-				kvp.Add("userId", UserID);
-				return kvp;
+                var kvp = new JsonKeyValuePairs
+                {
+                    { "title", Title },
+                    { "body", Body },
+                    { "userId", UserID }
+                };
+                return kvp;
 			}
 		}
 	}

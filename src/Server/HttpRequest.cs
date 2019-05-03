@@ -34,26 +34,22 @@ namespace HttpPack.Server
 	
 	public class HttpRequest : HttpBase
 	{
-		private readonly Encoding encoding;
 		private readonly HttpServer parent;
 		private HttpMethod method;
 		private string fullUrl;
 		private string query;
-		private string reference;
 		private String protocolVersion;
 		private bool headerRecived;
 		
 		// header
 		private int contentLength;
 		private int bytesRecived;
-		private string contentType;
 		private byte[] data;
 
 		#region constructor
 		
 		public HttpRequest(HttpConnection connection)
 		{
-            this.encoding = Encoding.ASCII;
 			this.parent = connection.Parent;
 			this.UserData = connection.Parent.UserData;
 			this.RequestError = false;
@@ -245,7 +241,6 @@ namespace HttpPack.Server
 			this.fullUrl = CleanUrlString(initialRequest[1]);
 			string[] url = this.fullUrl.Split('#');
 			this.Path = StringHelper.TrimStart(url[0], 1);
-			this.reference = url.Length > 1 ? url[1] : "";
 			
 			url = this.Path.Split('?');
 			this.Path = url[0];
@@ -298,7 +293,6 @@ namespace HttpPack.Server
 					case "user-agent":
 						break;
 					case "content-type":
-						this.contentType = requestHeader[1].TrimWhiteSpace();
 						break;
 					case "if-none-match":
 						this.ETag = requestHeader[1].TrimWhiteSpace();

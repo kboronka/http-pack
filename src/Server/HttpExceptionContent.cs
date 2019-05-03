@@ -12,9 +12,11 @@ namespace HttpPack.Server
         public HttpExceptionContent(Exception ex) : base()
         {
             var inner = ExceptionHelper.GetInner(ex);
-            var json = new JsonKeyValuePairs();
-            json.Add("message", inner.Message);
-            json.Add("stackTrace", ExceptionHelper.GetStackTrace(inner));
+            var json = new JsonKeyValuePairs
+            {
+                { "message", inner.Message },
+                { "stackTrace", ExceptionHelper.GetStackTrace(inner) }
+            };
 
             var body = json.Stringify();
 
