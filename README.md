@@ -36,8 +36,9 @@ public static JsonKeyValuePairs GetPost(int id)
 {
     var uri = string.Format("https://jsonplaceholder.typicode.com/posts/{0}", id);
     
-    var client = new RestClient();
-    var res = client.Fetch(uri);
+    var client = new HttpClient();
+    var auth = "";
+    var res = client.Get(uri, auth);
     
     if (res.Code == 200)
     {
@@ -47,14 +48,14 @@ public static JsonKeyValuePairs GetPost(int id)
     return null;
 }
 
-public static int CreatePost(Post post, string auth)
+public static int CreateNewPost(Post post, string auth)
 {
-    var req = new JsonKeyValuePairs();
-    req.Add("body", post);
+    var json = new JsonKeyValuePairs();
+    json.Add("post", post);
     
     var uri = "https://jsonplaceholder.typicode.com/posts";
     var client = new RestClient();
-    var res = client.Fetch(uri, WebRequestMethods.Http.Post, req, auth);
+    var res = client.Post(uri, json, auth);
     
     if (res.Code == 201)    // 201 = Created
     {
