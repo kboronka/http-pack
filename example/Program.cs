@@ -25,6 +25,8 @@ namespace example
             Console.WriteLine();
             Console.Write("Press any key to stop http server . . . ");
             Console.ReadKey(true);
+            Console.WriteLine();
+            Console.Write("Shutting down . . . ");
         }
     }
 }
