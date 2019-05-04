@@ -75,7 +75,6 @@ namespace HttpPack.Server
 		public string WebSocketKey { get; private set; }
 		public string WebSocketProtocol { get; private set; }
 		public object UserData { get; private set; }
-
         public string RemoteEndpoint { get; private set; }
 
         public HttpMethod Method
@@ -213,7 +212,9 @@ namespace HttpPack.Server
 			
 			ParseHeader(ref bufferIn);
 			if (!headerRecived)
-				return;
+            {
+                return;
+            }
 			
 			incomingRequestRecived |= (this.contentLength == 0);
 			ParseData(ref bufferIn);
@@ -223,10 +224,12 @@ namespace HttpPack.Server
 		private void ParseHeader(ref byte[] bufferIn)
 		{
 			if (headerRecived)
-				return;
-			
-			// Request Line
-			string requestLine = ReadLine(ref bufferIn);
+            {
+                return;
+            }
+
+            // Request Line
+            string requestLine = ReadLine(ref bufferIn);
 			if (string.IsNullOrEmpty(requestLine))
 			{
 				throw new InvalidDataException("request line missing");
