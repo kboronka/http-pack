@@ -21,18 +21,18 @@ using System.Net;
 
 namespace HttpPack
 {
-	public class RestClient
+	public class HttpClient
 	{
 		private WebClientEx client;
 		private const int TimeoutFallbackValue = 1000;	// 1 second
 		private readonly int timeoutOverride;
 		
-		public RestClient(int timeoutOverride)
+		public HttpClient(int timeoutOverride)
 		{
 			this.timeoutOverride = timeoutOverride;
 		}
 		
-		public RestClient()
+		public HttpClient()
 			: this(TimeoutFallbackValue)
 		{
 			
@@ -49,20 +49,20 @@ namespace HttpPack
 		/// <param name="requestBody">json body</param>
 		/// <param name="authorization">added to the http head if authorization is not null or empty</param>
 		/// <returns>Returns a FetchResponse, holding a response status code and a string representing JSON.</returns>
-		public FetchResponse Fetch(string url, string method, string requestBody, string authorization)
+		public FetchResponse Post(string url, string requestBody, string contentType, string authorization)
 		{
-			return Fetch(url, method, requestBody, authorization, "application/json");
+			return Fetch(url, "POST", requestBody, authorization, contentType);
 		}
 		
-		public FetchResponse Fetch(string url, string method, JsonKeyValuePairs kvp, string authorization)
+		public FetchResponse Post(string url, JsonKeyValuePairs json, string authorization)
 		{
-			return Fetch(url, method, kvp.Stringify(), authorization, "application/json");
+			return Fetch(url, "POST", json.Stringify(), authorization, "application/json");
 		}
 		
 		
-		public FetchResponse Fetch(string url)
+		public FetchResponse Get(string url, string authorization)
 		{
-			return Fetch(url, "GET", "", "", "");
+			return Fetch(url, "GET", "", authorization, "");
 		}
 
 		/// <summary>
@@ -77,7 +77,7 @@ namespace HttpPack
 		/// <param name="authorization">added to the http head if authorization is not null or empty</param>
 		/// <param name="contentType">request content type</param>
 		/// <returns>Returns a FetchResponse, holding a response status code and a string representing JSON.</returns>
-		public FetchResponse Fetch(string url, string method, string requestBody, string authorization, string contentType)
+		private FetchResponse Fetch(string url, string method, string requestBody, string authorization, string contentType)
 		{
 			DateTime startedOnUtc = DateTime.UtcNow;
 			string responseBody = null;

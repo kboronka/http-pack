@@ -14,8 +14,8 @@ namespace example
         {
             var uri = "https://www.howsmyssl.com/a/check";
 
-            var client = new RestClient();
-            var res = client.Fetch(uri);
+            var client = new HttpClient();
+            var res = client.Get(uri, "");
 
             if (res.Code == 200)
             {

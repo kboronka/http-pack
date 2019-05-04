@@ -32,8 +32,8 @@ namespace example
 
             Console.WriteLine("");
             Console.WriteLine("HttpGet -- " + uri);
-            var client = new RestClient();
-            var res = client.Fetch(uri);
+            var client = new HttpClient();
+            var res = client.Get(uri, "");
 
             if (res.Code == 200)
             {
@@ -60,8 +60,8 @@ namespace example
             Console.WriteLine("");
             Console.WriteLine("HttpPost -- " + uri);
 
-            var client = new RestClient();
-            var res = client.Fetch(uri, WebRequestMethods.Http.Post, req, auth);
+            var client = new HttpClient();
+            var res = client.Post(uri, req, auth);
 
             if (res.Code == 201)    // 201 = Created
             {
