@@ -3,6 +3,8 @@ A C# http library which includes a server, client along with json parsing tools,
 
 ## Example Server
 ```C#
+using HttpPack;
+
 public static void Main(string[] args)
 {
     var server = new HttpServer(4600, @"C:\wwwroot", null);
@@ -14,6 +16,8 @@ public static void Main(string[] args)
 
 ## Example Server Controller
 ```C#
+using HttpPack;
+
 [IsController]
 class SampleController
 {
@@ -32,6 +36,8 @@ class SampleController
 
 ## Example Client
 ```C#
+using HttpPack;
+
 public static JsonKeyValuePairs GetPost(int id)
 {
     var uri = string.Format("https://jsonplaceholder.typicode.com/posts/{0}", id);
@@ -54,7 +60,7 @@ public static int CreateNewPost(Post post, string auth)
     json.Add("post", post);
     
     var uri = "https://jsonplaceholder.typicode.com/posts";
-    var client = new RestClient();
+    var client = new HttpClient();
     var res = client.Post(uri, json, auth);
     
     if (res.Code == 201)    // 201 = Created
