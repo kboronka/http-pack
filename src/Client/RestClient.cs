@@ -20,8 +20,9 @@ using System.Text;
 using System.Net;
 
 using HttpPack.Json;
+using HttpPack.Net;
 
-namespace HttpPack.Net
+namespace HttpPack
 {
 	public class RestClient
 	{

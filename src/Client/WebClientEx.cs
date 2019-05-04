@@ -21,7 +21,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace HttpPack.Net
 {
-    public class WebClientEx : WebClient
+    internal class WebClientEx : WebClient
     {
         private CookieContainer container = new CookieContainer();
 

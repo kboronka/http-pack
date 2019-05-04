@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HttpPack.Client
+namespace HttpPack
 {
     public static class Url
     {

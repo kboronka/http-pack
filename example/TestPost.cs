@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 
+using HttpPack;
 using HttpPack.Json;
-using HttpPack.Net;
 
 namespace example
 {

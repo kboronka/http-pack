@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using HttpPack;
 using HttpPack.Json;
-using HttpPack.Net;
 
 namespace example
 {
