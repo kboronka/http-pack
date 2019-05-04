@@ -28,14 +28,15 @@ namespace HttpPack.Server
 	public enum HttpMethod
 	{
 		GET,
+        HEAD,
 		POST,
-		HEAD
+		PUT,
+        DELETE
 	}
 	
 	public class HttpRequest : HttpBase
 	{
 		private readonly HttpServer parent;
-		private HttpMethod method;
 		private string fullUrl;
 		private string query;
 		private String protocolVersion;
@@ -77,10 +78,7 @@ namespace HttpPack.Server
 		public object UserData { get; private set; }
         public string RemoteEndpoint { get; private set; }
 
-        public HttpMethod Method
-		{
-			get { return method; }
-		}
+        public HttpMethod Method { get; private set; }
 
 		public string FullUrl
 		{
@@ -253,14 +251,22 @@ namespace HttpPack.Server
 			
 			switch (initialRequest[0].ToUpper())
 			{
-				case "GET":
-					this.method = HttpMethod.GET;
-					break;
-				case "POST":
-					this.method = HttpMethod.POST;
-					break;
-					//TODO: handle the HEAD request type
-				default:
+                case "GET":
+                    this.Method = HttpMethod.GET;
+                    break;
+                case "HEAD":
+                    this.Method = HttpMethod.HEAD;
+                    break;
+                case "POST":
+                    this.Method = HttpMethod.POST;
+                    break;
+                case "PUT":
+                    this.Method = HttpMethod.PUT;
+                    break;
+                case "DELETE":
+                    this.Method = HttpMethod.DELETE;
+                    break;
+                default:
 					throw new InvalidDataException("unknown request type \"" + initialRequest[0] + "\"");
 			}
 			
@@ -355,10 +361,12 @@ namespace HttpPack.Server
 		
 		private void ParseData(ref byte[] bufferIn)
 		{
-			if (this.method != HttpMethod.POST)
-				return;
+			if (this.Method != HttpMethod.POST)
+            {
+                return;
+            }
 			
-			// initilize data array
+			// initialize data array
 			if (this.bytesRecived == 0)
 			{
 				this.data = new Byte[this.contentLength];
@@ -429,7 +437,7 @@ namespace HttpPack.Server
 
         public override string ToString()
 		{
-			return this.method.ToString() + ": " + this.fullUrl;
+			return this.Method.ToString() + ": " + this.fullUrl;
 		}
 	}
 }
