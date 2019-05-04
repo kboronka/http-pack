@@ -11,12 +11,18 @@ namespace example
         {
             TestTLS.TLS11();
             TestBasics.Basics();
+            Console.WriteLine();
 
             var publicFolder = Path.Combine(Directory.GetCurrentDirectory(), @"..\..\public");
-            var server = new HttpServer(4600, publicFolder, null);
+            var port = 4600;
+            var server = new HttpServer(port, publicFolder, null);
+            Console.WriteLine(string.Format("Listening on port {0}", port));
 
-            var noFolderServer = new HttpServer(4601, null, null);
+            var noFolderServer = new HttpServer(port + 1, null, null);
+            Console.WriteLine(string.Format("Listening on port {0}", port + 1));
 
+
+            Console.WriteLine();
             Console.Write("Press any key to stop http server . . . ");
             Console.ReadKey(true);
         }
