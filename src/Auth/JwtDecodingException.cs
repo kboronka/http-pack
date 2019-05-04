@@ -1,8 +1,6 @@
 ﻿using System;
 
-using HttpPack.Json;
-
-namespace HttpPack.Auth
+namespace HttpPack
 {
 	/// <summary>
 	/// Description of JwtValidationFailedException.

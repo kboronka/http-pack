@@ -19,9 +19,8 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using HttpPack.Json;
 
-namespace HttpPack.Server
+namespace HttpPack
 {
 	public class HttpContent
 	{

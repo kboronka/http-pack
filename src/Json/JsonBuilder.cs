@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Globalization;
 
-namespace HttpPack.Json
+namespace HttpPack
 {
 	/// <summary>
 	/// Description of JsonBuilder.

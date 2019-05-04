@@ -19,9 +19,9 @@ using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 
-namespace HttpPack.Net
+namespace HttpPack
 {
-    internal class WebClientEx : WebClient
+    public class WebClientEx : WebClient
     {
         private CookieContainer container = new CookieContainer();
 
@@ -35,7 +35,7 @@ namespace HttpPack.Net
 
         public int Timeout { get; set; }
 
-        public HttpStatusCode StatusCode { get; set; }
+        public System.Net.HttpStatusCode StatusCode { get; set; }
 
         public WebClientEx(CookieContainer container, int timeout = DefaultHttpTimeout)
         {

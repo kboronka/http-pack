@@ -16,7 +16,7 @@
 using System;
 using System.Linq;
 
-namespace HttpPack.Net
+namespace HttpPack
 {
 	public class FetchResponse
 	{

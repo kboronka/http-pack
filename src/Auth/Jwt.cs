@@ -2,9 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-using HttpPack.Json;
-
-namespace HttpPack.Auth
+namespace HttpPack
 {
 	/// <summary>
 	/// JSON Web Token

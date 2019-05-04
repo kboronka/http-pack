@@ -1,14 +1,6 @@
-﻿/*
- * Created by SharpDevelop.
- * User: kboronka
- * Date: 4/25/2019
- * Time: 10:36 PM
- * 
- * To change this template use Tools | Options | Coding | Edit Standard Headers.
- */
-using System;
+﻿using System;
 
-using HttpPack.Json;
+using HttpPack;
 
 namespace example
 {

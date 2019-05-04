@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-using HttpPack.Server;
+using HttpPack;
 
 namespace example
 {

@@ -17,8 +17,7 @@ using System;
 using System.Linq;
 using System.Threading;
 
-using HttpPack.Json;
-using HttpPack.Fsm;
+using HttpPack;
 
 namespace HttpPack.Fsm
 {

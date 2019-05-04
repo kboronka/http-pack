@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Text;
 
-using HttpPack.Json;
-using HttpPack.Fsm;
-
-namespace HttpPack.Server
+namespace HttpPack
 {
     public class HttpJsonContent : HttpContent
     {

@@ -21,9 +21,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 
-using HttpPack.Json;
-
-namespace HttpPack.Server
+namespace HttpPack
 {
     public enum HttpMethod
     {

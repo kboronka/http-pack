@@ -16,7 +16,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace HttpPack.Json
+namespace HttpPack
 {
 	/// <summary>
 	/// Dictionary extension object.

@@ -17,7 +17,7 @@ using System;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace HttpPack.Fsm
+namespace HttpPack.Utils
 {
 	public static class ExceptionHelper
 	{

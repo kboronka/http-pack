@@ -15,7 +15,7 @@
 
 using System;
 
-namespace HttpPack.Server
+namespace HttpPack
 {
 	// base frame protocol
 	// http://tools.ietf.org/html/rfc6455#section-5.1

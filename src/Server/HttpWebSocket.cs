@@ -20,9 +20,7 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Threading;
 
-using HttpPack.Json;
-
-namespace HttpPack.Server
+namespace HttpPack
 {
 	public abstract class HttpWebSocket
 	{

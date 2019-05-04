@@ -21,7 +21,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Reflection;
 
-namespace HttpPack.Server
+namespace HttpPack
 {
     public class HttpServer : HttpBase
     {

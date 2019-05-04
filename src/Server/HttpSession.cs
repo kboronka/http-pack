@@ -19,7 +19,7 @@ using System.Threading;
 
 using HttpPack.Fsm;
 
-namespace HttpPack.Server
+namespace HttpPack
 {
     public class HttpSession
     {

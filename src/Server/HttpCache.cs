@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace HttpPack.Server
+namespace HttpPack
 {
     public class HttpCache
     {

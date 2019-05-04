@@ -15,7 +15,7 @@
 
 using System;
 
-namespace HttpPack.Server
+namespace HttpPack
 {
 	public class HttpBase
 	{

@@ -59,7 +59,7 @@
     </Compile>
     <Compile Include="Fsm\Command.cs" />
     <Compile Include="Fsm\CommandQueue.cs" />
-    <Compile Include="Fsm\ExceptionHelper.cs" />
+    <Compile Include="Utils\ExceptionHelper.cs" />
     <Compile Include="Fsm\Interval.cs" />
     <Compile Include="Fsm\Message.cs" />
     <Compile Include="Fsm\MessageQueue.cs" />

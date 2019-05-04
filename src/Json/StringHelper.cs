@@ -16,7 +16,7 @@
 using System;
 using System.Linq;
 
-namespace HttpPack.Json
+namespace HttpPack
 {
 	/// <summary>
 	/// Description of StringHelper.

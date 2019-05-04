@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HttpPack.Json
+namespace HttpPack
 {
 	/// <summary>
 	/// Description of IJsonObject.

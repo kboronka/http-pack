@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Net;
 
 using HttpPack;
-using HttpPack.Json;
 
 namespace example
 {

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Text;
 
+using HttpPack.Utils;
 
-using HttpPack.Json;
-using HttpPack.Fsm;
-
-namespace HttpPack.Server
+namespace HttpPack
 {
     public class HttpExceptionContent : HttpContent
     {
