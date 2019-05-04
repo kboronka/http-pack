@@ -25,232 +25,226 @@ using HttpPack.Json;
 
 namespace HttpPack.Server
 {
-	public enum HttpMethod
-	{
-		GET,
+    public enum HttpMethod
+    {
+        GET,
         HEAD,
-		POST,
-		PUT,
+        POST,
+        PUT,
         DELETE
-	}
-	
-	public class HttpRequest : HttpBase
-	{
-		private readonly HttpServer parent;
-		private string fullUrl;
-		private string query;
-		private String protocolVersion;
-		private bool headerRecived;
-		
-		// header
-		private int contentLength;
-		private int bytesRecived;
-		private byte[] data;
+    }
 
-		#region constructor
-		
-		public HttpRequest(HttpConnection connection)
-		{
-			this.parent = connection.Parent;
-			this.UserData = connection.Parent.UserData;
-			this.RequestError = false;
+    public class HttpRequest : HttpBase
+    {
+        private readonly HttpServer parent;
+        private string fullUrl;
+        private string query;
+        private bool headerRecived;
+
+        // header
+        private int contentLength;
+        private int bytesRecived;
+        private byte[] data;
+
+        #region constructor
+
+        public HttpRequest(HttpConnection connection)
+        {
+            this.parent = connection.Parent;
+            this.UserData = connection.Parent.UserData;
+            this.RequestError = false;
             this.RemoteEndpoint = ((IPEndPoint)connection.Socket.Client.RemoteEndPoint).Address.ToString();
             this.ReadRequest(connection.Stream, connection.Socket);
         }
 
         ~HttpRequest()
-		{
-		}
-		
-		#endregion
-		
-		#region properties
+        {
+        }
 
-		public string Header { get; private set; }
-		public string Path { get; set; }
-		public string ETag { get; private set; }
-		public HttpSession Session { get; private set; }
-		public HttpResponse Response { get; private set; }
-		public HttpWebSocket WebSocket { get; set; }
-		public bool IsWebSocket { get; private set; }
-		public string WebSocketKey { get; private set; }
-		public string WebSocketProtocol { get; private set; }
-		public object UserData { get; private set; }
+        #endregion
+
+        #region properties
+
+        public string Header { get; private set; }
+        public string Path { get; set; }
+        public string ETag { get; private set; }
+        public HttpSession Session { get; private set; }
+        public HttpResponse Response { get; private set; }
+        public HttpWebSocket WebSocket { get; set; }
+        public bool IsWebSocket { get; private set; }
+        public string WebSocketKey { get; private set; }
+        public string WebSocketProtocol { get; private set; }
+        public object UserData { get; private set; }
         public string RemoteEndpoint { get; private set; }
-
+        public string Authorization { get; private set; }
         public HttpMethod Method { get; private set; }
+        public string ProtocolVersion { get; private set; }
+        public string ContentType { get; private set; }
+        public bool RequestError { get; private set; }
 
-		public string FullUrl
-		{
-			get { return fullUrl; }
-		}
+        public string FullUrl
+        {
+            get { return fullUrl; }
+        }
 
-		public string Query
-		{
-			get { return query; }
-		}
-		
-		public byte[] Data
-		{
-			get { return data; }
-		}
-		
-		private string json;
-		public string Json
-		{
-			get
-			{
-				if (!String.IsNullOrEmpty(json))
-				{
-					return json;
-				}
-				
-				json = JsonHelper.BytesToJson(data);
-				return json;
-			}
-		}
-		
-		public string ProtocolVersion
-		{
-			get { return protocolVersion; }
-		}
-		
-		public HttpServer Server
-		{
-			get { return parent; }
-		}
-		
-		public bool RequestError { get; private set; }
-		
-		#endregion
-		
-		#region read request
-		
-		private bool incomingRequestRecived;
+        public string Query
+        {
+            get { return query; }
+        }
 
-		private void ReadRequest(NetworkStream stream, TcpClient socket)
-		{
-			// Read and parse request
-			var buffer = new byte[0] { };
-			
-			// TODO: add request timeout
-			//var timeout = new Timing.Interval(10000);
+        public byte[] Data
+        {
+            get { return data; }
+        }
 
-			while (!incomingRequestRecived)
-			{
-				try
-				{
-					byte[] incomingPacket = this.ReadIncomingPacket(stream, socket);
-					buffer = CombineByteArrays(buffer, incomingPacket);
-					
-					if (buffer.Length > 0 && incomingPacket.Length == 0)
-					{
-						// buffer is complete
-						this.ProcessIncomingBuffer(ref buffer);
-					}
-					else if (incomingPacket.Length != 0)
-					{
-						// wait until entire request is recived
-						Thread.Sleep(1);
-					}
-					
-					Thread.Sleep(1);
-				}
-				catch (Exception ex)
-				{
-					throw(ex);
-				}
-			}
-			
-			this.Response = new HttpResponse(this);
-		}
-		
-		public byte[] ReadIncomingPacket(NetworkStream stream, TcpClient socket)
-		{
-			try
-			{
-				if (socket == null || stream == null)
-					return new byte[0] { };
-				
-				lock (socket)
-				{
-					if (socket.Available > 0 && stream.DataAvailable)
-					{
-						var packetBytes = new byte[socket.Available];
-						stream.Read(packetBytes, 0, packetBytes.Length);
-						return packetBytes;
-					}
-				}
-			}
-			catch (ObjectDisposedException)
-			{
-				throw;
-				// The NetworkStream is closed.
-			}
-			catch (IOException)
-			{
-				throw;
-				// The underlying Socket is closed.
-			}
-			catch (SocketException)
-			{
-				throw;
-			}
-			catch (Exception)
-			{
-				throw;
-			}
-			
-			return new byte[0] { };
-		}
-		
-		private void ProcessIncomingBuffer(ref byte[] bufferIn)
-		{
-			Header += StringHelper.GetString(bufferIn);
-			
-			ParseHeader(ref bufferIn);
-			if (!headerRecived)
+        public HttpServer Server
+        {
+            get { return parent; }
+        }
+
+        public JsonKeyValuePairs Body
+        {
+            get
+            {
+                if (ContentType.Contains(@"application/json"))
+                {
+                    var body = StringHelper.GetString(data);
+                    return new JsonKeyValuePairs(body);
+                }
+
+                return new JsonKeyValuePairs();
+            }
+        }
+
+        #endregion
+
+        #region read request
+
+        private bool incomingRequestRecived;
+
+        private void ReadRequest(NetworkStream stream, TcpClient socket)
+        {
+            // Read and parse request
+            var buffer = new byte[0] { };
+
+            // TODO: add request timeout
+            //var timeout = new Timing.Interval(10000);
+
+            while (!incomingRequestRecived)
+            {
+                try
+                {
+                    byte[] incomingPacket = this.ReadIncomingPacket(stream, socket);
+                    buffer = CombineByteArrays(buffer, incomingPacket);
+
+                    if (buffer.Length > 0 && incomingPacket.Length == 0)
+                    {
+                        // buffer is complete
+                        this.ProcessIncomingBuffer(ref buffer);
+                    }
+                    else if (incomingPacket.Length != 0)
+                    {
+                        // wait until entire request is received
+                        Thread.Sleep(1);
+                    }
+
+                    Thread.Sleep(1);
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+            }
+
+            this.Response = new HttpResponse(this);
+        }
+
+        public byte[] ReadIncomingPacket(NetworkStream stream, TcpClient socket)
+        {
+            try
+            {
+                if (socket == null || stream == null)
+                    return new byte[0] { };
+
+                lock (socket)
+                {
+                    if (socket.Available > 0 && stream.DataAvailable)
+                    {
+                        var packetBytes = new byte[socket.Available];
+                        stream.Read(packetBytes, 0, packetBytes.Length);
+                        return packetBytes;
+                    }
+                }
+            }
+            catch (ObjectDisposedException)
+            {
+                throw;
+                // The NetworkStream is closed.
+            }
+            catch (IOException)
+            {
+                throw;
+                // The underlying Socket is closed.
+            }
+            catch (SocketException)
+            {
+                throw;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return new byte[0] { };
+        }
+
+        private void ProcessIncomingBuffer(ref byte[] bufferIn)
+        {
+            Header += StringHelper.GetString(bufferIn);
+
+            ParseHeader(ref bufferIn);
+            if (!headerRecived)
             {
                 return;
             }
-			
-			incomingRequestRecived |= (this.contentLength == 0);
-			ParseData(ref bufferIn);
-			incomingRequestRecived |= this.bytesRecived >= this.contentLength;
-		}
-		
-		private void ParseHeader(ref byte[] bufferIn)
-		{
-			if (headerRecived)
+
+            incomingRequestRecived |= (this.contentLength == 0);
+            ParseData(ref bufferIn);
+            incomingRequestRecived |= this.bytesRecived >= this.contentLength;
+        }
+
+        private void ParseHeader(ref byte[] bufferIn)
+        {
+            if (headerRecived)
             {
                 return;
             }
 
             // Request Line
             string requestLine = ReadLine(ref bufferIn);
-			if (string.IsNullOrEmpty(requestLine))
-			{
-				throw new InvalidDataException("request line missing");
-			}
-			
-			string[] initialRequest = requestLine.Split(' ');
-			if (initialRequest.Length != 3)
-			{
-				throw new InvalidDataException("the initial request line should contain three fields");
-			}
+            if (string.IsNullOrEmpty(requestLine))
+            {
+                throw new InvalidDataException("request line missing");
+            }
 
-			this.fullUrl = CleanUrlString(initialRequest[1]);
-			string[] url = this.fullUrl.Split('#');
-			this.Path = StringHelper.TrimStart(url[0], 1);
-			
-			url = this.Path.Split('?');
-			this.Path = url[0];
-			this.query = url.Length > 1 ? url[1] : "";
-			
-			this.protocolVersion = initialRequest[2];
-			
-			switch (initialRequest[0].ToUpper())
-			{
+            string[] initialRequest = requestLine.Split(' ');
+            if (initialRequest.Length != 3)
+            {
+                throw new InvalidDataException("the initial request line should contain three fields");
+            }
+
+            this.fullUrl = CleanUrlString(initialRequest[1]);
+            string[] url = this.fullUrl.Split('#');
+            this.Path = StringHelper.TrimStart(url[0], 1);
+
+            url = this.Path.Split('?');
+            this.Path = url[0];
+            this.query = url.Length > 1 ? url[1] : "";
+
+            this.ProtocolVersion = initialRequest[2];
+
+            switch (initialRequest[0].ToUpper())
+            {
                 case "GET":
                     this.Method = HttpMethod.GET;
                     break;
@@ -267,150 +261,154 @@ namespace HttpPack.Server
                     this.Method = HttpMethod.DELETE;
                     break;
                 default:
-					throw new InvalidDataException("unknown request type \"" + initialRequest[0] + "\"");
-			}
-			
-			string line = "";
-			string sessionID = "";
-			
-			while (!this.headerRecived)
-			{
-				line = ReadLine(ref bufferIn);
-				
-				this.headerRecived = string.IsNullOrEmpty(line);
-				
-				string[] requestHeader = line.Split(':');
-				#if DEBUG
-				System.Diagnostics.Debug.WriteLine(line);
-				#endif
-				
-				switch (requestHeader[0].TrimWhiteSpace().ToLower())
-				{
-					case "connection":
-						this.IsWebSocket = requestHeader[1].TrimWhiteSpace() == "Upgrade";
-						break;
-					case "sec-websocket-key":
-						this.WebSocketKey = requestHeader[1].TrimWhiteSpace();
-						break;
-					case "sec-websocket-protocol":
-						this.WebSocketProtocol = requestHeader[1].TrimWhiteSpace();
-						break;
-					case "content-length":
-						this.contentLength = int.Parse(requestHeader[1]);
-						this.bytesRecived = 0;
-						break;
-					case "user-agent":
-						break;
-					case "content-type":
-						break;
-					case "if-none-match":
-						this.ETag = requestHeader[1].TrimWhiteSpace();
-						break;
-					case "cookie":
-						sessionID = requestHeader[1].TrimWhiteSpace();
-						var matches = Regex.Matches(requestHeader[1], @"sarSession=([^;]+)");
-						
-						foreach (Match match in matches)
-						{
-							var id = match.Groups[1].Value;
-							lock (Server.Sessions)
-							{
-								if (Server.Sessions.ContainsKey(id))
-								{
-									this.Session = Server.Sessions[id];
-								}
-							}
-						}
-						
-						break;
-				}
-				
-				if (this.headerRecived)
-				{
-					break;
-				}
-			}
-			
-			if (this.Session == null)
-			{
-				this.Session = new HttpSession(this.Server);
-				this.Session.SessionExpired += new HttpSession.SessionExpiredHandler(this.RemoveSession);
-				lock (Server.Sessions)
-				{
-					Server.Sessions.Add(this.Session.ID, this.Session);
-				}
-			}
-			
-			this.Session.LastRequest = DateTime.Now;
-		}
+                    throw new InvalidDataException("unknown request type \"" + initialRequest[0] + "\"");
+            }
 
-		private void RemoveSession(HttpSession session)
-		{
-			try
-			{
-				lock (Server.Sessions)
-				{
-					Server.Sessions.Remove(session.ID);
-				}
-			}
-			catch
-			{
-				
-			}
-		}
-		
-		private void ParseData(ref byte[] bufferIn)
-		{
-			if (this.Method != HttpMethod.POST)
+            string line = "";
+            string sessionID = "";
+
+            while (!this.headerRecived)
+            {
+                line = ReadLine(ref bufferIn);
+
+                this.headerRecived = string.IsNullOrEmpty(line);
+
+                string[] requestHeader = line.Split(':');
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine(line);
+#endif
+
+                switch (requestHeader[0].TrimWhiteSpace().ToLower())
+                {
+                    case "connection":
+                        this.IsWebSocket = requestHeader[1].TrimWhiteSpace() == "Upgrade";
+                        break;
+                    case "sec-websocket-key":
+                        this.WebSocketKey = requestHeader[1].TrimWhiteSpace();
+                        break;
+                    case "sec-websocket-protocol":
+                        this.WebSocketProtocol = requestHeader[1].TrimWhiteSpace();
+                        break;
+                    case "content-length":
+                        this.contentLength = int.Parse(requestHeader[1]);
+                        this.bytesRecived = 0;
+                        break;
+                    case "user-agent":
+                        break;
+                    case "content-type":
+                        this.ContentType = requestHeader[1];
+                        break;
+                    case "if-none-match":
+                        this.ETag = requestHeader[1].TrimWhiteSpace();
+                        break;
+                    case "cookie":
+                        sessionID = requestHeader[1].TrimWhiteSpace();
+                        var matches = Regex.Matches(requestHeader[1], @"sarSession=([^;]+)");
+
+                        foreach (Match match in matches)
+                        {
+                            var id = match.Groups[1].Value;
+                            lock (Server.Sessions)
+                            {
+                                if (Server.Sessions.ContainsKey(id))
+                                {
+                                    this.Session = Server.Sessions[id];
+                                }
+                            }
+                        }
+
+                        break;
+                    case "authorization":
+                        this.Authorization = requestHeader[1].TrimWhiteSpace();
+                        break;
+                }
+
+                if (this.headerRecived)
+                {
+                    break;
+                }
+            }
+
+            if (this.Session == null)
+            {
+                this.Session = new HttpSession(this.Server);
+                this.Session.SessionExpired += new HttpSession.SessionExpiredHandler(this.RemoveSession);
+                lock (Server.Sessions)
+                {
+                    Server.Sessions.Add(this.Session.ID, this.Session);
+                }
+            }
+
+            this.Session.LastRequest = DateTime.Now;
+        }
+
+        private void RemoveSession(HttpSession session)
+        {
+            try
+            {
+                lock (Server.Sessions)
+                {
+                    Server.Sessions.Remove(session.ID);
+                }
+            }
+            catch
+            {
+
+            }
+        }
+
+        private void ParseData(ref byte[] bufferIn)
+        {
+            if (this.Method != HttpMethod.POST)
             {
                 return;
             }
-			
-			// initialize data array
-			if (this.bytesRecived == 0)
-			{
-				this.data = new Byte[this.contentLength];
-			}
-			
-			System.Buffer.BlockCopy(bufferIn, this.bytesRecived, this.data, this.bytesRecived, bufferIn.Length);
-			this.bytesRecived += bufferIn.Length;
-		}
-		
-		private static string ReadLine(ref byte[] bufferIn)
-		{
-			for (int i = 0; i < bufferIn.Length; i++)
-			{
-				if (bufferIn[i] == '\n')
-				{
-					byte[] newBufferIn = new Byte[bufferIn.Length - i - 1];
-					System.Buffer.BlockCopy(bufferIn, i + 1, newBufferIn, 0, newBufferIn.Length);
-					
-					if (i > 0 && bufferIn[i - 1] == '\r')
-						i--;
-					
-					string line = Encoding.ASCII.GetString(bufferIn, 0, i);
 
-					bufferIn = newBufferIn;
-					return line;
-				}
-			}
-			
-			return null;
-		}
-		
-		private static string CleanUrlString(string url)
-		{
-			while (url.Contains("%"))
-			{
-				int index = url.LastIndexOf('%');
-				string characterCode = url.Substring(index + 1, 2);
-				char character = (char)Convert.ToInt32(characterCode, 16);
-				
-				url = url.Substring(0, index) + character.ToString() + url.Substring(index + 3);
-			}
-			
-			return url;
-		}
+            // initialize data array
+            if (this.bytesRecived == 0)
+            {
+                this.data = new Byte[this.contentLength];
+            }
+
+            System.Buffer.BlockCopy(bufferIn, this.bytesRecived, this.data, this.bytesRecived, bufferIn.Length);
+            this.bytesRecived += bufferIn.Length;
+        }
+
+        private static string ReadLine(ref byte[] bufferIn)
+        {
+            for (int i = 0; i < bufferIn.Length; i++)
+            {
+                if (bufferIn[i] == '\n')
+                {
+                    byte[] newBufferIn = new Byte[bufferIn.Length - i - 1];
+                    System.Buffer.BlockCopy(bufferIn, i + 1, newBufferIn, 0, newBufferIn.Length);
+
+                    if (i > 0 && bufferIn[i - 1] == '\r')
+                        i--;
+
+                    string line = Encoding.ASCII.GetString(bufferIn, 0, i);
+
+                    bufferIn = newBufferIn;
+                    return line;
+                }
+            }
+
+            return null;
+        }
+
+        private static string CleanUrlString(string url)
+        {
+            while (url.Contains("%"))
+            {
+                int index = url.LastIndexOf('%');
+                string characterCode = url.Substring(index + 1, 2);
+                char character = (char)Convert.ToInt32(characterCode, 16);
+
+                url = url.Substring(0, index) + character.ToString() + url.Substring(index + 3);
+            }
+
+            return url;
+        }
 
         #endregion
 
@@ -436,8 +434,8 @@ namespace HttpPack.Server
         }
 
         public override string ToString()
-		{
-			return this.Method.ToString() + ": " + this.fullUrl;
-		}
-	}
+        {
+            return this.Method.ToString() + ": " + this.fullUrl;
+        }
+    }
 }
