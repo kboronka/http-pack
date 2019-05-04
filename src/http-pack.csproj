@@ -89,6 +89,7 @@
     <Compile Include="Server\HttpView.cs" />
     <Compile Include="Server\HttpWebSocket.cs" />
     <Compile Include="Server\HttpWebSocketFrame.cs" />
+    <Compile Include="Client\Url.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
