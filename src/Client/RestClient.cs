@@ -58,9 +58,13 @@ namespace HttpPack
 		{
 			return Fetch(url, "POST", json.Stringify(), authorization, "application/json");
 		}
-		
-		
-		public FetchResponse Get(string url, string authorization)
+
+        public FetchResponse Post(string url, IJsonObject jsonObject, string authorization)
+        {
+            return Fetch(url, "POST", jsonObject.KeyValuePairs.Stringify(), authorization, "application/json");
+        }
+
+        public FetchResponse Get(string url, string authorization)
 		{
 			return Fetch(url, "GET", "", authorization, "");
 		}
