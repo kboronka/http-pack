@@ -13,11 +13,14 @@ namespace example
     {
         public static bool Basics()
         {
-            var postOne = HttpGet(1);
-            Console.WriteLine(postOne.Stringify());
+            var postOne = GetExample(1);
+            Console.WriteLine("GET Example response: " + postOne.Stringify());
+            Console.WriteLine();
 
             var newPost = new Post("foo", "bar", 1);
-            HttpPost(newPost, "");
+            var postResponse = PostExample(newPost, "");
+            Console.WriteLine("POST Example response: " + postResponse.ToString());
+            Console.WriteLine();
 
             return true;
         }
@@ -26,19 +29,15 @@ namespace example
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        private static JsonKeyValuePairs HttpGet(int id)
+        private static JsonKeyValuePairs GetExample(int id)
         {
             var uri = string.Format("https://jsonplaceholder.typicode.com/posts/{0}", id);
-
-            Console.WriteLine("");
-            Console.WriteLine("HttpGet -- " + uri);
-            var client = new HttpClient();
+            var client = new HttpClient<JsonKeyValuePairs>();
             var res = client.Get(uri, "");
 
             if (res.Code == 200)
             {
-                Console.WriteLine("  " + res.Body);
-                return new JsonKeyValuePairs(res.Body);
+                return res.Body;
             }
 
             return null;
@@ -49,7 +48,7 @@ namespace example
         /// </summary>
         /// <param name="post"></param>
         /// <returns></returns>
-        private static int HttpPost(Post post, string auth)
+        private static int PostExample(Post post, string auth)
         {
             var req = new JsonKeyValuePairs
             {
@@ -57,23 +56,17 @@ namespace example
             };
 
             var uri = "https://jsonplaceholder.typicode.com/posts";
-            Console.WriteLine("");
-            Console.WriteLine("HttpPost -- " + uri);
-
-            var client = new HttpClient();
+            var client = new HttpClient<JsonKeyValuePairs>();
             var res = client.Post(uri, req, auth);
 
             if (res.Code == 201)    // 201 = Created
             {
-                Console.WriteLine("  " + res.Body);
-                var kvp = new JsonKeyValuePairs(res.Body);
-                return (int)kvp["id"];
+                return (int)res.Body["id"];
             }
             else
             {
                 return -1;
             }
         }
-
     }
 }

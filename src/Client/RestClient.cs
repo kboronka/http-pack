@@ -21,7 +21,7 @@ using System.Net;
 
 namespace HttpPack
 {
-	public class HttpClient
+	public class HttpClient<T>
 	{
 		private WebClientEx client;
 		private const int TimeoutFallbackValue = 1000;	// 1 second
@@ -49,22 +49,22 @@ namespace HttpPack
 		/// <param name="requestBody">json body</param>
 		/// <param name="authorization">added to the http head if authorization is not null or empty</param>
 		/// <returns>Returns a FetchResponse, holding a response status code and a string representing JSON.</returns>
-		public FetchResponse Post(string url, string requestBody, string contentType, string authorization)
+		public FetchResponse<T> Post(string url, string requestBody, string contentType, string authorization)
 		{
 			return Fetch(url, "POST", requestBody, authorization, contentType);
 		}
 		
-		public FetchResponse Post(string url, JsonKeyValuePairs json, string authorization)
+		public FetchResponse<T> Post(string url, JsonKeyValuePairs json, string authorization)
 		{
 			return Fetch(url, "POST", json.Stringify(), authorization, "application/json");
 		}
 
-        public FetchResponse Post(string url, IJsonObject jsonObject, string authorization)
+        public FetchResponse<T> Post(string url, IJsonObject jsonObject, string authorization)
         {
             return Fetch(url, "POST", jsonObject.KeyValuePairs.Stringify(), authorization, "application/json");
         }
 
-        public FetchResponse Get(string url, string authorization)
+        public FetchResponse<T> Get(string url, string authorization)
 		{
 			return Fetch(url, "GET", "", authorization, "");
 		}
@@ -81,7 +81,7 @@ namespace HttpPack
 		/// <param name="authorization">added to the http head if authorization is not null or empty</param>
 		/// <param name="contentType">request content type</param>
 		/// <returns>Returns a FetchResponse, holding a response status code and a string representing JSON.</returns>
-		private FetchResponse Fetch(string url, string method, string requestBody, string authorization, string contentType)
+		private FetchResponse<T> Fetch(string url, string method, string requestBody, string authorization, string contentType)
 		{
 			DateTime startedOnUtc = DateTime.UtcNow;
 			string responseBody = null;
@@ -134,7 +134,7 @@ namespace HttpPack
 				responseBody = "<!-- " + ex.Message + " -->" + responseBody;
 			}
 			
-			var response = new FetchResponse(responseStatusCode, responseBody);
+			var response = new FetchResponse<T>(responseStatusCode, responseBody);
 			return response;
 		}
 		

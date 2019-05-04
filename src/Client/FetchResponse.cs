@@ -18,15 +18,15 @@ using System.Linq;
 
 namespace HttpPack
 {
-	public class FetchResponse
+	public class FetchResponse<T>
 	{
 		public FetchResponse(int responseStatusCode, string responseBody)
 		{
 			this.Code = responseStatusCode;
-			this.Body = responseBody;
+            this.Body = (T)Activator.CreateInstance(typeof(T), new object[] { responseBody });
 		}
 		
 		public int Code { get; private set; }
-		public string Body { get; private set; }
+		public T Body { get; private set; }
 	}
 }
