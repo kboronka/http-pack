@@ -108,7 +108,7 @@ namespace HttpPack.Server
             {
                 if (ContentType.Contains(@"application/json"))
                 {
-                    var body = StringHelper.GetString(data);
+                    var body = Encoding.UTF8.GetString(this.Data);
                     return new JsonKeyValuePairs(body);
                 }
 
