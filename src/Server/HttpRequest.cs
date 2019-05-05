@@ -270,11 +270,7 @@ namespace HttpPack
                 line = ReadLine(ref bufferIn);
 
                 this.headerRecived = string.IsNullOrEmpty(line);
-
                 string[] requestHeader = line.Split(':');
-#if DEBUG
-                System.Diagnostics.Debug.WriteLine(line);
-#endif
 
                 switch (requestHeader[0].TrimWhiteSpace().ToLower())
                 {
