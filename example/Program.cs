@@ -13,7 +13,17 @@ namespace example
             TestBasics.Basics();
             Console.WriteLine();
 
-            var publicFolder = Path.Combine(Directory.GetCurrentDirectory(), @"..\..\public");
+            var client = new HttpClient<JsonKeyValuePairs>();
+            //var r = client.Get("http://localhost:4000/agents", "");
+            var kvp = new JsonKeyValuePairs()
+            {
+                {"name","debug"}
+            };
+
+            var r = client.Post("http://localhost:4000/agents/register", kvp, "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkYXMtYnVpbGQtYWdlbnQiLCJuYW1lIjoidW5kZWZpbmVkIG5hbWUiLCJwb3J0Ijo0NzAwfQ.jEykpWI7DOlvWEGXaW17awn9LPxDjPSrwCZsvDCVmOw");
+
+
+            var publicFolder = Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\public");
             var port = 4600;
             var server = new HttpServer(port, publicFolder, null);
             Console.WriteLine(string.Format("Listening on port {0}", port));

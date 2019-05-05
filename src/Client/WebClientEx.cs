@@ -54,10 +54,9 @@ namespace HttpPack
         {
             ServicePointManager.ServerCertificateValidationCallback += ValidateRemoteCertificate;
             ServicePointManager.SecurityProtocol =
-                SecurityProtocolType.Tls |      // TLS 1.0
-            (SecurityProtocolType)3072 |        // TLS 1.2
-            (SecurityProtocolType)768 |         // TLS 1.1
-            SecurityProtocolType.Ssl3;
+                SecurityProtocolType.Tls |
+                SecurityProtocolType.Tls11 |
+                SecurityProtocolType.Tls12;
   
             ServicePointManager.ServerCertificateValidationCallback = OnValidateCertificate;
             ServicePointManager.Expect100Continue = true;
