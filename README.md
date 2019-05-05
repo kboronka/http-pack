@@ -42,7 +42,7 @@ public static JsonKeyValuePairs GetPost(int id)
 {
     var uri = string.Format("https://jsonplaceholder.typicode.com/posts/{0}", id);
     
-    var client = new HttpClient();
+    var client = new HttpClient<JsonKeyValuePairs>();
     var auth = "";
     var res = client.Get(uri, auth);
     
@@ -60,7 +60,7 @@ public static int CreateNewPost(Post post, string auth)
     json.Add("post", post);
     
     var uri = "https://jsonplaceholder.typicode.com/posts";
-    var client = new HttpClient();
+    var client = new HttpClient<JsonKeyValuePairs>();
     var res = client.Post(uri, json, auth);
     
     if (res.Code == 201)    // 201 = Created
