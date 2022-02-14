@@ -13,14 +13,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-
 namespace HttpPack
 {
-	public class HttpBase
-	{
-		public HttpBase()
-		{
-		}
-	}
+    public class HttpBase
+    {
+    }
 }

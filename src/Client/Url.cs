@@ -27,10 +27,18 @@ namespace HttpPack
 
         private static string CombineUrlParts(string a, string b)
         {
-            char seperator = '/';
+            var seperator = '/';
 
-            if (string.IsNullOrEmpty(a)) return b;
-            if (string.IsNullOrEmpty(b)) return a;
+            if (string.IsNullOrEmpty(a))
+            {
+                return b;
+            }
+
+            if (string.IsNullOrEmpty(b))
+            {
+                return a;
+            }
+
             return a.TrimEnd(seperator) + seperator + b.TrimStart(seperator);
         }
 

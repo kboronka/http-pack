@@ -14,7 +14,6 @@
  */
 
 using System;
-
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -23,32 +22,26 @@ namespace HttpPack
 {
     public class WebClientEx : WebClient
     {
-        private CookieContainer container = new CookieContainer();
-
         public const int DefaultHttpTimeout = 100000;
-
-        public CookieContainer CookieContainer
-        {
-            get { return container; }
-            set { container = value; }
-        }
-
-        public int Timeout { get; set; }
-
-        public System.Net.HttpStatusCode StatusCode { get; set; }
 
         public WebClientEx(CookieContainer container, int timeout = DefaultHttpTimeout)
         {
-            this.container = container;
-            this.Timeout = timeout;
+            this.CookieContainer = container;
+            Timeout = timeout;
             SetupCertificateSecurity();
         }
 
         public WebClientEx(int timeout = DefaultHttpTimeout)
         {
-            this.Timeout = timeout;
+            Timeout = timeout;
             SetupCertificateSecurity();
         }
+
+        public CookieContainer CookieContainer { get; set; } = new CookieContainer();
+
+        public int Timeout { get; set; }
+
+        public System.Net.HttpStatusCode StatusCode { get; set; }
 
         private void SetupCertificateSecurity()
         {
@@ -57,15 +50,16 @@ namespace HttpPack
                 SecurityProtocolType.Tls |
                 SecurityProtocolType.Tls11 |
                 SecurityProtocolType.Tls12;
-  
+
             ServicePointManager.ServerCertificateValidationCallback = OnValidateCertificate;
             ServicePointManager.Expect100Continue = true;
         }
 
-        private static bool ValidateRemoteCertificate(object sender, X509Certificate cert, X509Chain chain, SslPolicyErrors error)
+        private static bool ValidateRemoteCertificate(object sender, X509Certificate cert, X509Chain chain,
+            SslPolicyErrors error)
         {
             // If the certificate is a valid, signed certificate, return true.
-            if (error == System.Net.Security.SslPolicyErrors.None)
+            if (error == SslPolicyErrors.None)
             {
                 return true;
             }
@@ -75,17 +69,17 @@ namespace HttpPack
 
         public WebRequest GetWebRequestEx(Uri address)
         {
-            return this.GetWebRequest(address);
+            return GetWebRequest(address);
         }
 
         protected override WebRequest GetWebRequest(Uri address)
         {
-            WebRequest r = base.GetWebRequest(address);
+            var r = base.GetWebRequest(address);
             var request = r as HttpWebRequest;
-            request.Timeout = this.Timeout;
+            request.Timeout = Timeout;
             if (request != null)
             {
-                request.CookieContainer = container;
+                request.CookieContainer = CookieContainer;
             }
 
             return r;
@@ -93,9 +87,9 @@ namespace HttpPack
 
         protected override WebResponse GetWebResponse(WebRequest request, IAsyncResult result)
         {
-            request.Timeout = this.Timeout;
-            WebResponse response = base.GetWebResponse(request, result);
-            var httpResponse = (HttpWebResponse)response;
+            request.Timeout = Timeout;
+            var response = base.GetWebResponse(request, result);
+            var httpResponse = (HttpWebResponse) response;
             StatusCode = httpResponse.StatusCode;
             ReadCookies(response);
             return response;
@@ -103,9 +97,9 @@ namespace HttpPack
 
         protected override WebResponse GetWebResponse(WebRequest request)
         {
-            request.Timeout = this.Timeout;
-            WebResponse response = base.GetWebResponse(request);
-            var httpResponse = (HttpWebResponse)response;
+            request.Timeout = Timeout;
+            var response = base.GetWebResponse(request);
+            var httpResponse = (HttpWebResponse) response;
             StatusCode = httpResponse.StatusCode;
             ReadCookies(response);
             return response;
@@ -116,8 +110,8 @@ namespace HttpPack
             var response = r as HttpWebResponse;
             if (response != null)
             {
-                CookieCollection cookies = response.Cookies;
-                container.Add(cookies);
+                var cookies = response.Cookies;
+                CookieContainer.Add(cookies);
             }
         }
 
@@ -144,8 +138,9 @@ namespace HttpPack
             var response = UploadString(path, "DELETE", "");
             return response;
         }
+
         private static bool OnValidateCertificate(object sender, X509Certificate certificate, X509Chain chain,
-                                                  SslPolicyErrors sslPolicyErrors)
+            SslPolicyErrors sslPolicyErrors)
         {
             return true;
         }

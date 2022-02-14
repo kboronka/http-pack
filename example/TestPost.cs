@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net;
-
 using HttpPack;
 
 namespace example
@@ -19,13 +13,14 @@ namespace example
 
             var newPost = new Post("foo", "bar", 1);
             var postResponse = PostExample(newPost, "");
-            Console.WriteLine("POST Example response: " + postResponse.ToString());
+            Console.WriteLine("POST Example response: " + postResponse);
             Console.WriteLine();
 
             return true;
         }
+
         /// <summary>
-        /// HTTP GET example
+        ///     HTTP GET example
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -44,7 +39,7 @@ namespace example
         }
 
         /// <summary>
-        /// HTTP POST example
+        ///     HTTP POST example
         /// </summary>
         /// <param name="post"></param>
         /// <returns></returns>
@@ -52,21 +47,19 @@ namespace example
         {
             var req = new JsonKeyValuePairs
             {
-                { "body", post }
+                {"body", post}
             };
 
             var uri = "https://jsonplaceholder.typicode.com/posts";
             var client = new HttpClient<JsonKeyValuePairs>();
             var res = client.Post(uri, req, auth);
 
-            if (res.Code == 201)    // 201 = Created
+            if (res.Code == 201) // 201 = Created
             {
-                return (int)res.Body["id"];
+                return (int) res.Body["id"];
             }
-            else
-            {
-                return -1;
-            }
+
+            return -1;
         }
     }
 }

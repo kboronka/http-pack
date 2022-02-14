@@ -1,24 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using HttpPack;
+﻿using HttpPack;
 
 namespace example
 {
     [IsPrimaryController]
     [IsController]
-    class SampleController
+    internal class SampleController
     {
         [IsPrimaryAction]
         public static HttpContent JsonContentSample(HttpRequest request)
         {
             var json = new JsonKeyValuePairs
             {
-                { "testString", "test" },
-                { "testInt", 1234 }
+                {"testString", "test"},
+                {"testInt", 1234}
             };
 
             return new HttpJsonContent(json);

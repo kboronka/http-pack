@@ -16,7 +16,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace HttpPack
 {
@@ -24,6 +23,22 @@ namespace HttpPack
     {
         private readonly Dictionary<string, HttpCachedFile> cache;
         private readonly HttpServer server;
+
+        public HttpCache(HttpServer server)
+        {
+            cache = new Dictionary<string, HttpCachedFile>();
+            this.server = server;
+
+            // read all files on root folder
+            if (server.Root != null)
+            {
+                foreach (var file in GetAllFiles(server.Root))
+                {
+                    var request = file.Substring(server.Root.Length + 1).ToLower();
+                    cache.Add(request, new HttpCachedFile(file));
+                }
+            }
+        }
 
         public List<string> Files
         {
@@ -40,22 +55,6 @@ namespace HttpPack
             }
         }
 
-        public HttpCache(HttpServer server)
-        {
-            this.cache = new Dictionary<string, HttpCachedFile>();
-            this.server = server;
-
-            // read all files on root folder
-            if (server.Root != null)
-            {
-                foreach (var file in GetAllFiles(server.Root))
-                {
-                    var request = file.Substring(server.Root.Length + 1).ToLower();
-                    cache.Add(request, new HttpCachedFile(file));
-                }
-            }
-        }
-
         public bool Contains(HttpRequest request)
         {
             if (server.Root == null)
@@ -64,35 +63,34 @@ namespace HttpPack
             }
 
             var requestPath = request.Path;
-            string filePath = Path.Combine(server.Root, requestPath.Replace(@"/", @"\"));
+            var filePath = Path.Combine(server.Root, requestPath.Replace(@"/", @"\"));
 
             return Contains(filePath);
         }
 
         public bool Contains(string filePath)
         {
-            return this.cache.ContainsKey(filePath);
+            return cache.ContainsKey(filePath);
         }
 
         public HttpCachedFile Get(HttpRequest request)
         {
             var requestPath = request.Path;
 
-            string filePath = Path.Combine(server.Root, requestPath.Replace(@"/", @"\"));
+            var filePath = Path.Combine(server.Root, requestPath.Replace(@"/", @"\"));
             return Get(filePath);
         }
 
         public bool Find(string filePath)
         {
-            return (this.cache.ContainsKey(filePath) || File.Exists(filePath));
+            return cache.ContainsKey(filePath) || File.Exists(filePath);
         }
 
         public HttpCachedFile Get(string filePath)
         {
-
-            if (this.cache.ContainsKey(filePath))
+            if (cache.ContainsKey(filePath))
             {
-                return this.cache[filePath];
+                return cache[filePath];
             }
 
             // TODO: this doesn't work
@@ -100,7 +98,7 @@ namespace HttpPack
             {
                 var request = filePath.Substring(server.Root.Length + 1).ToLower();
                 var newFile = new HttpCachedFile(filePath);
-                this.cache.Add(request, newFile);
+                cache.Add(request, newFile);
 
                 return newFile;
             }
@@ -110,12 +108,12 @@ namespace HttpPack
 
         public static List<string> GetAllFiles(string root)
         {
-            if (String.IsNullOrEmpty(root))
+            if (string.IsNullOrEmpty(root))
             {
                 throw new NullReferenceException("root search path was not specified");
             }
 
-            string pattern = "*.*";
+            var pattern = "*.*";
 
             // handle filepaths in root
             if (!Directory.Exists(root) && root.Contains("*"))
@@ -131,7 +129,7 @@ namespace HttpPack
         {
             var files = new List<string>();
             var dirs = GetAllDirectories(root);
-            foreach (string dir in dirs)
+            foreach (var dir in dirs)
             {
                 try
                 {
@@ -139,7 +137,6 @@ namespace HttpPack
                 }
                 catch
                 {
-
                 }
             }
 
@@ -154,7 +151,7 @@ namespace HttpPack
             {
                 directories.Add(root);
 
-                foreach (string dir in System.IO.Directory.GetDirectories(root))
+                foreach (var dir in Directory.GetDirectories(root))
                 {
                     directories.AddRange(GetAllDirectories(dir));
                 }
@@ -162,6 +159,5 @@ namespace HttpPack
 
             return directories;
         }
-
     }
 }

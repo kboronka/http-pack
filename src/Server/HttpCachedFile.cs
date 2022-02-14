@@ -14,9 +14,7 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -24,92 +22,46 @@ using System.Threading;
 
 namespace HttpPack
 {
-	public class HttpCachedFile
-	{
-		public DateTime LastModified { get; protected set; }
-		public string ContentType { get; private set; }
-		public string ETag { get; private set; }
-		public byte[] Data { get; private set; }
+    public class HttpCachedFile
+    {
+        private readonly FileSystemWatcher watcher;
 
-		public bool ParsingRequired { get; protected set; }
-		
-		protected bool embedded;
-		protected string path;
-		
-		private readonly FileSystemWatcher watcher;
-		
-		#region constructors
-		
-		protected HttpCachedFile(string path, byte[] data)
-		{
-			this.path = path;
-			this.embedded = true;
+        protected bool embedded;
+        protected string path;
+        public DateTime LastModified { get; protected set; }
+        public string ContentType { get; }
+        public string ETag { get; private set; }
+        public byte[] Data { get; private set; }
 
-            string extension = Path.GetExtension(path).ToLower();
-			this.ContentType = HttpMimeTypes.GetMimeType(extension);
-			this.Data = data;
-			this.ETag = GetETag(this.Data);
-			this.ParsingRequired = false;
-			
-			if (this.ContentType.Contains("text") || this.ContentType.Contains("xml"))
-			{
-				string text = Encoding.ASCII.GetString(this.Data);
-				MatchCollection matches = Regex.Matches(text, HttpContent.INCLUDE_RENDER_SYNTAX);
-				if (matches.Count > 0) this.ParsingRequired = true;
-				
-				// include linked externals
-				matches = Regex.Matches(text, HttpContent.CONTENT_RENDER_SYNTAX);
-				if (matches.Count > 0) this.ParsingRequired = true;
-			}
-		}
-		
-		public HttpCachedFile(string path) : this(path, File.ReadAllBytes(path))
-		{
-			this.LastModified = File.GetLastWriteTimeUtc(path);
+        public bool ParsingRequired { get; protected set; }
 
-            watcher = new FileSystemWatcher
+        private void OnChanged(object sender, FileSystemEventArgs e)
+        {
+            Data = ReadAllBytes(path);
+            ETag = GetETag(Data);
+            LastModified = File.GetLastWriteTimeUtc(path);
+        }
+
+        private void OnDelete(object sender, FileSystemEventArgs e)
+        {
+        }
+
+        private void OnRenamed(object sender, RenamedEventArgs e)
+        {
+        }
+
+        private static string GetETag(byte[] data)
+        {
+            var hash = new MD5CryptoServiceProvider().ComputeHash(data);
+            var hex = "";
+
+            foreach (var b in hash)
             {
-                Path = Path.GetDirectoryName(path),
-                Filter = Path.GetFileName(path),
-                NotifyFilter = NotifyFilters.LastWrite
-            };
-            watcher.Changed += new FileSystemEventHandler(OnChanged);
-			watcher.Deleted += new FileSystemEventHandler(OnDelete);
-			watcher.Renamed += new RenamedEventHandler(OnRenamed);
-			watcher.EnableRaisingEvents = true;
-		}
-		
-		#endregion
+                hex += b.ToString("X2");
+            }
 
-		private void OnChanged(object sender, FileSystemEventArgs e)
-		{
-			this.Data = ReadAllBytes(path);
-			this.ETag = GetETag(this.Data);
-			this.LastModified = File.GetLastWriteTimeUtc(path);
-		}
-		
-		private void OnDelete(object sender, FileSystemEventArgs e)
-		{
-			
-		}
-
-		private void OnRenamed(object sender, RenamedEventArgs e)
-		{
-			
-		}
-		
-		private static string GetETag(byte[] data)
-		{
-			var hash = new MD5CryptoServiceProvider().ComputeHash(data);
-			var hex = "";
-			
-			foreach (var b in hash)
-			{
-				hex += b.ToString("X2");
-			}
-			
-			return @""" + hex + @""";
-		}
+            return @""" + hex + @""";
+        }
 
         private static byte[] ReadAllBytes(string path)
         {
@@ -118,7 +70,7 @@ namespace HttpPack
             using (var fs = WaitForFile(path, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 buffer = new byte[fs.Length];
-                fs.Read(buffer, 0, (int)fs.Length);
+                fs.Read(buffer, 0, (int) fs.Length);
             }
 
             return buffer;
@@ -127,7 +79,7 @@ namespace HttpPack
         private static FileStream WaitForFile(string path, FileMode mode, FileAccess access, FileShare share)
         {
             // check if file is locked by another application
-            for (int attempts = 0; attempts < 10; attempts++)
+            for (var attempts = 0; attempts < 10; attempts++)
             {
                 try
                 {
@@ -146,5 +98,54 @@ namespace HttpPack
 
             return null;
         }
+
+        #region constructors
+
+        protected HttpCachedFile(string path, byte[] data)
+        {
+            this.path = path;
+            embedded = true;
+
+            var extension = Path.GetExtension(path).ToLower();
+            ContentType = HttpMimeTypes.GetMimeType(extension);
+            Data = data;
+            ETag = GetETag(Data);
+            ParsingRequired = false;
+
+            if (ContentType.Contains("text") || ContentType.Contains("xml"))
+            {
+                var text = Encoding.ASCII.GetString(Data);
+                var matches = Regex.Matches(text, HttpContent.INCLUDE_RENDER_SYNTAX);
+                if (matches.Count > 0)
+                {
+                    ParsingRequired = true;
+                }
+
+                // include linked externals
+                matches = Regex.Matches(text, HttpContent.CONTENT_RENDER_SYNTAX);
+                if (matches.Count > 0)
+                {
+                    ParsingRequired = true;
+                }
+            }
+        }
+
+        public HttpCachedFile(string path) : this(path, File.ReadAllBytes(path))
+        {
+            LastModified = File.GetLastWriteTimeUtc(path);
+
+            watcher = new FileSystemWatcher
+            {
+                Path = Path.GetDirectoryName(path),
+                Filter = Path.GetFileName(path),
+                NotifyFilter = NotifyFilters.LastWrite
+            };
+            watcher.Changed += OnChanged;
+            watcher.Deleted += OnDelete;
+            watcher.Renamed += OnRenamed;
+            watcher.EnableRaisingEvents = true;
+        }
+
+        #endregion
     }
 }

@@ -13,15 +13,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
-
 namespace HttpPack
 {
-	public class HttpView
-	{
-		public HttpView()
-		{
-			
-		}
-	}
+    public class HttpView
+    {
+    }
 }

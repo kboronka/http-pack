@@ -3,14 +3,13 @@
 namespace HttpPack
 {
 	/// <summary>
-	/// Description of JsonException.
+	///     Description of JsonException.
 	/// </summary>
 	public class JsonException : Exception
-	{
-		public JsonException(string message)
-			: base(message)
-		{
-			
-		}
-	}
+    {
+        public JsonException(string message)
+            : base(message)
+        {
+        }
+    }
 }

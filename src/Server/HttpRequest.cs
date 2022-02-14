@@ -34,25 +34,47 @@ namespace HttpPack
 
     public class HttpRequest : HttpBase
     {
-        private readonly HttpServer parent;
-        private string fullUrl;
-        private string query;
-        private bool headerRecived;
+        private int bytesRecived;
 
         // header
         private int contentLength;
-        private int bytesRecived;
-        private byte[] data;
+        private bool headerRecived;
+
+        private static byte[] CombineByteArrays(params byte[][] arrays)
+        {
+            var sum = 0;
+            var offset = 0;
+
+            foreach (var array in arrays)
+            {
+                sum += array.Length;
+            }
+
+            var result = new byte[sum];
+
+            foreach (var array in arrays)
+            {
+                Buffer.BlockCopy(array, 0, result, offset, array.Length);
+                offset += array.Length;
+            }
+
+            return result;
+        }
+
+        public override string ToString()
+        {
+            return Method + ": " + FullUrl;
+        }
 
         #region constructor
 
         public HttpRequest(HttpConnection connection)
         {
-            this.parent = connection.Parent;
-            this.UserData = connection.Parent.UserData;
-            this.RequestError = false;
-            this.RemoteEndpoint = ((IPEndPoint)connection.Socket.Client.RemoteEndPoint).Address.ToString();
-            this.ReadRequest(connection.Stream, connection.Socket);
+            Server = connection.Parent;
+            UserData = connection.Parent.UserData;
+            RequestError = false;
+            RemoteEndpoint = ((IPEndPoint) connection.Socket.Client.RemoteEndPoint).Address.ToString();
+            ReadRequest(connection.Stream, connection.Socket);
         }
 
         ~HttpRequest()
@@ -72,33 +94,21 @@ namespace HttpPack
         public bool IsWebSocket { get; private set; }
         public string WebSocketKey { get; private set; }
         public string WebSocketProtocol { get; private set; }
-        public object UserData { get; private set; }
-        public string RemoteEndpoint { get; private set; }
+        public object UserData { get; }
+        public string RemoteEndpoint { get; }
         public string Authorization { get; private set; }
         public HttpMethod Method { get; private set; }
         public string ProtocolVersion { get; private set; }
         public string ContentType { get; private set; }
-        public bool RequestError { get; private set; }
+        public bool RequestError { get; }
 
-        public string FullUrl
-        {
-            get { return fullUrl; }
-        }
+        public string FullUrl { get; private set; }
 
-        public string Query
-        {
-            get { return query; }
-        }
+        public string Query { get; private set; }
 
-        public byte[] Data
-        {
-            get { return data; }
-        }
+        public byte[] Data { get; private set; }
 
-        public HttpServer Server
-        {
-            get { return parent; }
-        }
+        public HttpServer Server { get; }
 
         public JsonKeyValuePairs Body
         {
@@ -106,7 +116,7 @@ namespace HttpPack
             {
                 if (ContentType.Contains(@"application/json"))
                 {
-                    var body = Encoding.UTF8.GetString(this.Data);
+                    var body = Encoding.UTF8.GetString(Data);
                     return new JsonKeyValuePairs(body);
                 }
 
@@ -132,13 +142,13 @@ namespace HttpPack
             {
                 try
                 {
-                    byte[] incomingPacket = this.ReadIncomingPacket(stream, socket);
+                    var incomingPacket = ReadIncomingPacket(stream, socket);
                     buffer = CombineByteArrays(buffer, incomingPacket);
 
                     if (buffer.Length > 0 && incomingPacket.Length == 0)
                     {
                         // buffer is complete
-                        this.ProcessIncomingBuffer(ref buffer);
+                        ProcessIncomingBuffer(ref buffer);
                     }
                     else if (incomingPacket.Length != 0)
                     {
@@ -150,11 +160,11 @@ namespace HttpPack
                 }
                 catch (Exception ex)
                 {
-                    throw (ex);
+                    throw ex;
                 }
             }
 
-            this.Response = new HttpResponse(this);
+            Response = new HttpResponse(this);
         }
 
         public byte[] ReadIncomingPacket(NetworkStream stream, TcpClient socket)
@@ -162,7 +172,9 @@ namespace HttpPack
             try
             {
                 if (socket == null || stream == null)
+                {
                     return new byte[0] { };
+                }
 
                 lock (socket)
                 {
@@ -188,10 +200,6 @@ namespace HttpPack
             {
                 throw;
             }
-            catch (Exception)
-            {
-                throw;
-            }
 
             return new byte[0] { };
         }
@@ -206,9 +214,9 @@ namespace HttpPack
                 return;
             }
 
-            incomingRequestRecived |= (this.contentLength == 0);
+            incomingRequestRecived |= contentLength == 0;
             ParseData(ref bufferIn);
-            incomingRequestRecived |= this.bytesRecived >= this.contentLength;
+            incomingRequestRecived |= bytesRecived >= contentLength;
         }
 
         private void ParseHeader(ref byte[] bufferIn)
@@ -219,81 +227,81 @@ namespace HttpPack
             }
 
             // Request Line
-            string requestLine = ReadLine(ref bufferIn);
+            var requestLine = ReadLine(ref bufferIn);
             if (string.IsNullOrEmpty(requestLine))
             {
                 throw new InvalidDataException("request line missing");
             }
 
-            string[] initialRequest = requestLine.Split(' ');
+            var initialRequest = requestLine.Split(' ');
             if (initialRequest.Length != 3)
             {
                 throw new InvalidDataException("the initial request line should contain three fields");
             }
 
-            this.fullUrl = CleanUrlString(initialRequest[1]);
-            string[] url = this.fullUrl.Split('#');
-            this.Path = StringHelper.TrimStart(url[0], 1);
+            FullUrl = CleanUrlString(initialRequest[1]);
+            var url = FullUrl.Split('#');
+            Path = StringHelper.TrimStart(url[0], 1);
 
-            url = this.Path.Split('?');
-            this.Path = url[0];
-            this.query = url.Length > 1 ? url[1] : "";
+            url = Path.Split('?');
+            Path = url[0];
+            Query = url.Length > 1 ? url[1] : "";
 
-            this.ProtocolVersion = initialRequest[2];
+            ProtocolVersion = initialRequest[2];
 
             switch (initialRequest[0].ToUpper())
             {
                 case "GET":
-                    this.Method = HttpMethod.GET;
+                    Method = HttpMethod.GET;
                     break;
                 case "HEAD":
-                    this.Method = HttpMethod.HEAD;
+                    Method = HttpMethod.HEAD;
                     break;
                 case "POST":
-                    this.Method = HttpMethod.POST;
+                    Method = HttpMethod.POST;
                     break;
                 case "PUT":
-                    this.Method = HttpMethod.PUT;
+                    Method = HttpMethod.PUT;
                     break;
                 case "DELETE":
-                    this.Method = HttpMethod.DELETE;
+                    Method = HttpMethod.DELETE;
                     break;
                 default:
                     throw new InvalidDataException("unknown request type \"" + initialRequest[0] + "\"");
             }
 
-            string line = "";
-            string sessionID = "";
+            var line = "";
+            var sessionID = "";
 
-            while (!this.headerRecived)
+            while (!headerRecived)
             {
                 line = ReadLine(ref bufferIn);
 
-                this.headerRecived = string.IsNullOrEmpty(line);
-                string[] requestHeader = line.Split(':');
+                headerRecived = string.IsNullOrEmpty(line);
+                var requestHeader = line.Split(':');
 
                 switch (requestHeader[0].TrimWhiteSpace().ToLower())
                 {
                     case "connection":
-                        this.IsWebSocket = requestHeader[1].TrimWhiteSpace() == "Upgrade";
+                        IsWebSocket = requestHeader[1].TrimWhiteSpace() == "Upgrade";
                         break;
                     case "sec-websocket-key":
-                        this.WebSocketKey = requestHeader[1].TrimWhiteSpace();
+                        WebSocketKey = requestHeader[1].TrimWhiteSpace();
                         break;
                     case "sec-websocket-protocol":
-                        this.WebSocketProtocol = requestHeader[1].TrimWhiteSpace();
+                        WebSocketProtocol = requestHeader[1].TrimWhiteSpace();
                         break;
                     case "content-length":
-                        this.contentLength = int.Parse(requestHeader[1]);
-                        this.bytesRecived = 0;
+                        contentLength = int.Parse(requestHeader[1]);
+                        bytesRecived = 0;
                         break;
                     case "user-agent":
                         break;
                     case "content-type":
-                        this.ContentType = requestHeader[1];
+                        ContentType = requestHeader[1];
                         break;
                     case "if-none-match":
-                        this.ETag = requestHeader[1].TrimWhiteSpace();
+                        ETag = requestHeader[1].TrimWhiteSpace();
                         break;
                     case "cookie":
                         sessionID = requestHeader[1].TrimWhiteSpace();
@@ -306,34 +314,34 @@ namespace HttpPack
                             {
                                 if (Server.Sessions.ContainsKey(id))
                                 {
-                                    this.Session = Server.Sessions[id];
+                                    Session = Server.Sessions[id];
                                 }
                             }
                         }
 
                         break;
                     case "authorization":
-                        this.Authorization = requestHeader[1].TrimWhiteSpace();
+                        Authorization = requestHeader[1].TrimWhiteSpace();
                         break;
                 }
 
-                if (this.headerRecived)
+                if (headerRecived)
                 {
                     break;
                 }
             }
 
-            if (this.Session == null)
+            if (Session == null)
             {
-                this.Session = new HttpSession(this.Server);
-                this.Session.SessionExpired += new HttpSession.SessionExpiredHandler(this.RemoveSession);
+                Session = new HttpSession(Server);
+                Session.SessionExpired += RemoveSession;
                 lock (Server.Sessions)
                 {
-                    Server.Sessions.Add(this.Session.ID, this.Session);
+                    Server.Sessions.Add(Session.ID, Session);
                 }
             }
 
-            this.Session.LastRequest = DateTime.Now;
+            Session.LastRequest = DateTime.Now;
         }
 
         private void RemoveSession(HttpSession session)
@@ -347,40 +355,41 @@ namespace HttpPack
             }
             catch
             {
-
             }
         }
 
         private void ParseData(ref byte[] bufferIn)
         {
-            if (this.Method != HttpMethod.POST)
+            if (Method != HttpMethod.POST)
             {
                 return;
             }
 
             // initialize data array
-            if (this.bytesRecived == 0)
+            if (bytesRecived == 0)
             {
-                this.data = new Byte[this.contentLength];
+                Data = new byte[contentLength];
             }
 
-            System.Buffer.BlockCopy(bufferIn, this.bytesRecived, this.data, this.bytesRecived, bufferIn.Length);
-            this.bytesRecived += bufferIn.Length;
+            Buffer.BlockCopy(bufferIn, bytesRecived, Data, bytesRecived, bufferIn.Length);
+            bytesRecived += bufferIn.Length;
         }
 
         private static string ReadLine(ref byte[] bufferIn)
         {
-            for (int i = 0; i < bufferIn.Length; i++)
+            for (var i = 0; i < bufferIn.Length; i++)
             {
                 if (bufferIn[i] == '\n')
                 {
-                    byte[] newBufferIn = new Byte[bufferIn.Length - i - 1];
-                    System.Buffer.BlockCopy(bufferIn, i + 1, newBufferIn, 0, newBufferIn.Length);
+                    var newBufferIn = new byte[bufferIn.Length - i - 1];
+                    Buffer.BlockCopy(bufferIn, i + 1, newBufferIn, 0, newBufferIn.Length);
 
                     if (i > 0 && bufferIn[i - 1] == '\r')
+                    {
                         i--;
+                    }
 
-                    string line = Encoding.ASCII.GetString(bufferIn, 0, i);
+                    var line = Encoding.ASCII.GetString(bufferIn, 0, i);
 
                     bufferIn = newBufferIn;
                     return line;
@@ -394,42 +403,16 @@ namespace HttpPack
         {
             while (url.Contains("%"))
             {
-                int index = url.LastIndexOf('%');
-                string characterCode = url.Substring(index + 1, 2);
-                char character = (char)Convert.ToInt32(characterCode, 16);
+                var index = url.LastIndexOf('%');
+                var characterCode = url.Substring(index + 1, 2);
+                var character = (char) Convert.ToInt32(characterCode, 16);
 
-                url = url.Substring(0, index) + character.ToString() + url.Substring(index + 3);
+                url = url.Substring(0, index) + character + url.Substring(index + 3);
             }
 
             return url;
         }
 
         #endregion
-
-        private static byte[] CombineByteArrays(params byte[][] arrays)
-        {
-            int sum = 0;
-            int offset = 0;
-
-            foreach (byte[] array in arrays)
-            {
-                sum += array.Length;
-            }
-
-            var result = new byte[sum];
-
-            foreach (byte[] array in arrays)
-            {
-                System.Buffer.BlockCopy(array, 0, result, offset, array.Length);
-                offset += array.Length;
-            }
-
-            return result;
-        }
-
-        public override string ToString()
-        {
-            return this.Method.ToString() + ": " + this.fullUrl;
-        }
     }
 }

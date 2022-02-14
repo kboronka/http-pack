@@ -12,21 +12,20 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
- 
+
 using System;
-using System.Linq;
 
 namespace HttpPack
 {
-	public class FetchResponse<T>
-	{
-		public FetchResponse(int responseStatusCode, string responseBody)
-		{
-			this.Code = responseStatusCode;
-            this.Body = (T)Activator.CreateInstance(typeof(T), new object[] { responseBody });
-		}
-		
-		public int Code { get; private set; }
-		public T Body { get; private set; }
-	}
+    public class FetchResponse<T>
+    {
+        public FetchResponse(int responseStatusCode, string responseBody)
+        {
+            Code = responseStatusCode;
+            Body = (T) Activator.CreateInstance(typeof(T), responseBody);
+        }
+
+        public int Code { get; }
+        public T Body { get; }
+    }
 }

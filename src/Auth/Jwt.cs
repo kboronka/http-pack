@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Security.Cryptography;
 using System.Text;
-using HttpPack.Auth;
 
-namespace HttpPack
+namespace HttpPack.Auth
 {
     /// <summary>
     ///     JSON Web Token
@@ -59,11 +58,11 @@ namespace HttpPack
 
         private JsonKeyValuePairs CreateJwtHeader()
         {
-            const string Algorithm = "HS256";
+            const string algorithm = "HS256";
 
             var header = new JsonKeyValuePairs
             {
-                {"alg", Algorithm},
+                {"alg", algorithm},
                 {"typ", "JWT"}
             };
 

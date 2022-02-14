@@ -1,11 +1,10 @@
 ﻿using System;
 using System.IO;
-
 using HttpPack;
 
 namespace example
 {
-    class Program
+    internal class Program
     {
         public static void Main()
         {
@@ -16,10 +15,10 @@ namespace example
             var publicFolder = Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\public");
             var port = 4600;
             var server = new HttpServer(port, publicFolder, null);
-            Console.WriteLine(string.Format("Listening on port {0}", port));
+            Console.WriteLine("Listening on port {0}", port);
 
             var noFolderServer = new HttpServer(port + 1, null, null);
-            Console.WriteLine(string.Format("Listening on port {0}", port + 1));
+            Console.WriteLine("Listening on port {0}", port + 1);
 
 
             Console.WriteLine();

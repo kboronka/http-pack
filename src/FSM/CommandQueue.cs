@@ -15,58 +15,57 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace HttpPack.Fsm
 {
 	/// <summary>
-	/// Description of CommandQueue.
+	///     Description of CommandQueue.
 	/// </summary>
 	public class CommandQueue
-	{
-		private readonly object queueLock = new object();
-		private readonly List<Command> commands;
-		
-		public bool Available { get { return commands.Count > 0; } }
-		
-		public CommandQueue()
-		{
-			lock (queueLock)
-			{
-				commands = new List<Command>();
-			}
-		}
-		
-		public void QueueCommand(Enum command)
-		{
-			lock (queueLock)
-			{
-				commands.Add(new Command(command));
-			}
-		}
-		
-		public void QueueCommand(Enum command, params object[] paramerters)
-		{
-			lock (queueLock)
-			{
-				commands.Add(new Command(command, paramerters));
-			}
-		}
+    {
+        private readonly List<Command> commands;
+        private readonly object queueLock = new object();
 
-		public Command DequeueCommand()
-		{
-			lock (queueLock)
-			{
-				if (commands.Count == 0)
-				{
-					return null;
-				}
-				
-				var currentCommand = commands[0];
-				commands.RemoveAt(0);
-				
-				return currentCommand;
-			}
-		}
-	}
+        public CommandQueue()
+        {
+            lock (queueLock)
+            {
+                commands = new List<Command>();
+            }
+        }
+
+        public bool Available => commands.Count > 0;
+
+        public void QueueCommand(Enum command)
+        {
+            lock (queueLock)
+            {
+                commands.Add(new Command(command));
+            }
+        }
+
+        public void QueueCommand(Enum command, params object[] paramerters)
+        {
+            lock (queueLock)
+            {
+                commands.Add(new Command(command, paramerters));
+            }
+        }
+
+        public Command DequeueCommand()
+        {
+            lock (queueLock)
+            {
+                if (commands.Count == 0)
+                {
+                    return null;
+                }
+
+                var currentCommand = commands[0];
+                commands.RemoveAt(0);
+
+                return currentCommand;
+            }
+        }
+    }
 }

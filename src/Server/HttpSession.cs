@@ -16,54 +16,39 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-
 using HttpPack.Fsm;
 
 namespace HttpPack
 {
     public class HttpSession
     {
-        public string dataLock = "";
-
-
         public const int MAX_LIFE = 2;
-
-        private Dictionary<string, object> data;
         private readonly HttpServer server;
 
+        private Dictionary<string, object> data;
+        public string dataLock = "";
 
 
         public HttpSession(HttpServer server)
         {
             this.server = server;
-            this.ID = Guid.NewGuid().ToString("D");
-            this.CreationDate = DateTime.Now;
-            this.LastRequest = DateTime.Now;
-            this.data = new Dictionary<string, object>();
+            ID = Guid.NewGuid().ToString("D");
+            CreationDate = DateTime.Now;
+            LastRequest = DateTime.Now;
+            data = new Dictionary<string, object>();
 
-            this.expiryLoopThread = new Thread(this.ExpiryLoop)
+            expiryLoopThread = new Thread(ExpiryLoop)
             {
-                Name = "HttpSession " + this.ID,
+                Name = "HttpSession " + ID,
                 IsBackground = true
             };
-            this.expiryLoopThread.Start();
+            expiryLoopThread.Start();
         }
 
-        ~HttpSession()
-        {
-            this.expiryLoopShutdown = true;
-
-            if (this.expiryLoopThread != null && this.expiryLoopThread.IsAlive)
-            {
-                this.expiryLoopThread.Join();
-            }
-
-        }
-
-        public string ID { get; private set; }
-        public DateTime CreationDate { get; private set; }
+        public string ID { get; }
+        public DateTime CreationDate { get; }
         public DateTime LastRequest { get; set; }
-        public DateTime ExpiryDate { get { return LastRequest.AddDays(MAX_LIFE); } }
+        public DateTime ExpiryDate => LastRequest.AddDays(MAX_LIFE);
 
         public Dictionary<string, object> Data
         {
@@ -76,10 +61,20 @@ namespace HttpPack
             }
         }
 
+        ~HttpSession()
+        {
+            expiryLoopShutdown = true;
+
+            if (expiryLoopThread != null && expiryLoopThread.IsAlive)
+            {
+                expiryLoopThread.Join();
+            }
+        }
+
         #region service
 
         private readonly Thread expiryLoopThread;
-        private bool expiryLoopShutdown = false;
+        private bool expiryLoopShutdown;
 
         private void ExpiryLoop()
         {
@@ -92,16 +87,16 @@ namespace HttpPack
                 {
                     if (expiryCheck.Ready)
                     {
-                        if (DateTime.Now > this.ExpiryDate)
+                        if (DateTime.Now > ExpiryDate)
                         {
                             // expired
-                            this.data = new Dictionary<string, object>();
+                            data = new Dictionary<string, object>();
 
                             // throw an expired event
                             OnSessionExpiring(this);
 
                             // shutdown loop
-                            this.expiryLoopShutdown = true;
+                            expiryLoopShutdown = true;
                         }
                     }
 
@@ -122,17 +117,12 @@ namespace HttpPack
 
         #region session expired
 
-        private SessionExpiredHandler sessionExpired = null;
+        private SessionExpiredHandler sessionExpired;
+
         public event SessionExpiredHandler SessionExpired
         {
-            add
-            {
-                this.sessionExpired += value;
-            }
-            remove
-            {
-                this.sessionExpired -= value;
-            }
+            add => sessionExpired += value;
+            remove => sessionExpired -= value;
         }
 
         private void OnSessionExpiring(HttpSession session)
@@ -140,20 +130,18 @@ namespace HttpPack
             try
             {
                 SessionExpiredHandler handler;
-                if (null != (handler = (SessionExpiredHandler)this.sessionExpired))
+                if (null != (handler = sessionExpired))
                 {
                     handler(session);
                 }
             }
             catch
             {
-                
             }
         }
 
         #endregion
 
         #endregion
-
     }
 }

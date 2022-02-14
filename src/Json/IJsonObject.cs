@@ -1,12 +1,10 @@
-﻿using System;
-
-namespace HttpPack
+﻿namespace HttpPack
 {
 	/// <summary>
-	/// Description of IJsonObject.
+	///     Description of IJsonObject.
 	/// </summary>
 	public interface IJsonObject
-	{
-		JsonKeyValuePairs KeyValuePairs { get; }
-	}
+    {
+        JsonKeyValuePairs KeyValuePairs { get; }
+    }
 }

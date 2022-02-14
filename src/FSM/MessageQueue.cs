@@ -13,77 +13,73 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace HttpPack.Fsm
 {
 	/// <summary>
-	/// Description of MessageFIFO.
+	///     Description of MessageFIFO.
 	/// </summary>
 	public class MessageQueue<T>
-	{
-		private readonly object queueLock = new object();
-		private readonly List<Message<T>> queued;
-		
-		public bool Available { get { return queued.Any(m => !m.Sent); } }
-		
-		public List<Message<T>> Messages
-		{
-			get
-			{
-				return queued;
-			}
-		}
-		
-		public MessageQueue()
-		{
-			lock (queueLock)
-			{
-				queued = new List<Message<T>>();
-			}
-		}
-		
-		public void QueueItem(T message)
-		{
-			lock (queueLock)
-			{
-				queued.Add(new Message<T>(message));
-			}
-		}
-		
-		public void QueueItem(T message, Message<T>.MessageCallback responseCallback, int timeout, Message<T>.MessageExpiredCallback timeoutCallback)
-		{
-			lock (queueLock)
-			{
-				queued.Add(new Message<T>(message, responseCallback, timeout, timeoutCallback));
-			}
-		}
-		
-		public T DequeueItem()
-		{
-			lock (queueLock)
-			{
-				foreach (var message in queued)
-				{
-					if (!message.Sent)
-					{
-						message.Sent = true;
-						return message.PayLoad;
-					}
-				}
-			}
-			
-			return default(T);
-		}
-		
-		public void Cleanup()
-		{
-			lock (queueLock)
-			{
-				queued.RemoveAll(m => m.Recived || m.Expired);
-			}
-		}
-	}
+    {
+        private readonly object queueLock = new object();
+
+        public MessageQueue()
+        {
+            lock (queueLock)
+            {
+                Messages = new List<Message<T>>();
+            }
+        }
+
+        public bool Available
+        {
+            get { return Messages.Any(m => !m.Sent); }
+        }
+
+        public List<Message<T>> Messages { get; }
+
+        public void QueueItem(T message)
+        {
+            lock (queueLock)
+            {
+                Messages.Add(new Message<T>(message));
+            }
+        }
+
+        public void QueueItem(T message, Message<T>.MessageCallback responseCallback, int timeout,
+            Message<T>.MessageExpiredCallback timeoutCallback)
+        {
+            lock (queueLock)
+            {
+                Messages.Add(new Message<T>(message, responseCallback, timeout, timeoutCallback));
+            }
+        }
+
+        public T DequeueItem()
+        {
+            lock (queueLock)
+            {
+                foreach (var message in Messages)
+                {
+                    if (!message.Sent)
+                    {
+                        message.Sent = true;
+                        return message.PayLoad;
+                    }
+                }
+            }
+
+            return default;
+        }
+
+        public void Cleanup()
+        {
+            lock (queueLock)
+            {
+                Messages.RemoveAll(m => m.Recived || m.Expired);
+            }
+        }
+    }
 }

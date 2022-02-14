@@ -1,18 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Library</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-    <RootNamespace>HttpPack</RootNamespace>
-    <ApplicationIcon />
-    <StartupObject />
-    <Version>1.0.0</Version>
-    <FileVersion>1.0.0.0</FileVersion>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>Library</OutputType>
+        <TargetFramework>netcoreapp2.1</TargetFramework>
+        <RootNamespace>HttpPack</RootNamespace>
+        <ApplicationIcon/>
+        <StartupObject/>
+        <Version>1.0.0</Version>
+        <FileVersion>1.0.0.0</FileVersion>
+        <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    </PropertyGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;  xcopy /E /Y &quot;$(TargetDir)$(TargetName).*&quot; &quot;$(SolutionDir)dist\*.*&quot;&#xD;&#xA;)" />
-  </Target>
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;  xcopy /E /Y &quot;$(TargetDir)$(TargetName).*&quot; &quot;$(SolutionDir)dist\*.*&quot;&#xD;&#xA;)"/>
+    </Target>
 
 </Project>

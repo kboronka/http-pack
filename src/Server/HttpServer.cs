@@ -18,8 +18,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using System.Reflection;
+using System.Threading;
 
 namespace HttpPack
 {
@@ -30,143 +30,6 @@ namespace HttpPack
         protected int port;
         protected string root;
 
-        #region constructor
-
-        public HttpServer(int port, string wwwroot, object userData)
-        {
-            this.UserData = userData;
-            this.port = port;
-            if (wwwroot != null)
-            {
-                this.root = Path.GetFullPath(wwwroot);
-            }
-
-            var assembly = GetAssembly();
-            this.Start(GetReferencedAssemblies(assembly));
-        }
-
-        private void Start(List<Assembly> assemblies)
-        {
-            if (this.root != null && !Directory.Exists(this.root))
-            {
-                throw new DirectoryNotFoundException("root folder not found");
-            }
-
-            this.Connections = new List<HttpConnection>();
-            this.Sessions = new Dictionary<string, HttpSession>();
-
-            this.Cache = new HttpCache(this);
-            HttpController.LoadControllers(assemblies);
-            HttpWebSocket.LoadControllers(assemblies);
-
-            this.connectionWaitHandle = new AutoResetEvent(false);
-
-            this.listenerLoopThread = new Thread(this.ListenerLoop)
-            {
-                Name = "HttpServer Listener",
-                IsBackground = true
-            };
-            this.listenerLoopThread.Start();
-        }
-
-        ~HttpServer()
-        {
-            this.Stop();
-        }
-
-        public void Stop()
-        {
-            this.listenerLoopShutdown = true;
-            connectionWaitHandle.Set();
-            if (this.listenerLoopThread != null && this.listenerLoopThread.IsAlive)
-            {
-                this.listenerLoopThread.Join();
-            }
-        }
-
-        #endregion
-
-        #region properties
-
-        public List<HttpConnection> Connections { get; private set; }
-        public Dictionary<string, HttpSession> Sessions { get; private set; }
-        public string Root { get { return root; } }
-        public int Port { get { return port; } }
-        public string FavIcon { get; set; }
-        public HttpCache Cache { get; private set; }
-        public Object UserData { get; private set; }
-
-        #endregion
-
-        #region service
-
-        #region listners
-
-        private Thread listenerLoopThread;
-        private bool listenerLoopShutdown = false;
-
-        private void ListenerLoop()
-        {
-            Thread.Sleep(300);
-            this.listener = new TcpListener(IPAddress.Any, this.port);
-            this.listener.Start();
-
-            while (!listenerLoopShutdown)
-            {
-                try
-                {
-                    IAsyncResult result = this.listener.BeginAcceptTcpClient(this.AcceptTcpClientCallback, this.listener);
-                    this.connectionWaitHandle.WaitOne();
-                    this.connectionWaitHandle.Reset();
-                }
-                catch
-                {
-                    Thread.Sleep(5000);
-                }
-            }
-
-            // shutdown listner
-            if (this.listener != null)
-            {
-                this.listener.Stop();
-            }
-
-            this.listener = null;
-        }
-
-        private void AcceptTcpClientCallback(IAsyncResult ar)
-        {
-            try
-            {
-                var connection = (TcpListener)ar.AsyncState;
-                var client = connection.EndAcceptTcpClient(ar);
-
-                connectionWaitHandle.Set();
-
-                lock (Connections)
-                {
-                    Connections.Add(new HttpConnection(this, client));
-                    Connections.RemoveAll(c =>
-                                          {
-                                              if (c.Stopped)
-                                              {
-                                                  c.Dispose();
-                                                  return true;
-                                              }
-
-                                              return false;
-                                          });
-                }
-            }
-            catch
-            {
-                connectionWaitHandle.Set();
-            }
-        }
-
-        #endregion
-
-        #endregion
         public static Assembly GetAssembly()
         {
             try
@@ -175,7 +38,6 @@ namespace HttpPack
             }
             catch
             {
-
             }
 
             try
@@ -184,7 +46,6 @@ namespace HttpPack
             }
             catch
             {
-
             }
 
             throw new ApplicationException("Assembly Not Found");
@@ -197,9 +58,9 @@ namespace HttpPack
                 assembly
             };
 
-            foreach (AssemblyName assemblyName in assembly.GetReferencedAssemblies())
+            foreach (var assemblyName in assembly.GetReferencedAssemblies())
             {
-                string name = assemblyName.Name;
+                var name = assemblyName.Name;
 
                 if (!name.StartsWith("System")
                     && !name.StartsWith("mscorlib")
@@ -212,12 +73,149 @@ namespace HttpPack
                     }
                     catch
                     {
-
                     }
                 }
             }
 
             return assemblies;
         }
+
+        #region constructor
+
+        public HttpServer(int port, string wwwroot, object userData)
+        {
+            UserData = userData;
+            this.port = port;
+            if (wwwroot != null)
+            {
+                root = Path.GetFullPath(wwwroot);
+            }
+
+            var assembly = GetAssembly();
+            Start(GetReferencedAssemblies(assembly));
+        }
+
+        private void Start(List<Assembly> assemblies)
+        {
+            if (root != null && !Directory.Exists(root))
+            {
+                throw new DirectoryNotFoundException("root folder not found");
+            }
+
+            Connections = new List<HttpConnection>();
+            Sessions = new Dictionary<string, HttpSession>();
+
+            Cache = new HttpCache(this);
+            HttpController.LoadControllers(assemblies);
+            HttpWebSocket.LoadControllers(assemblies);
+
+            connectionWaitHandle = new AutoResetEvent(false);
+
+            listenerLoopThread = new Thread(ListenerLoop)
+            {
+                Name = "HttpServer Listener",
+                IsBackground = true
+            };
+            listenerLoopThread.Start();
+        }
+
+        ~HttpServer()
+        {
+            Stop();
+        }
+
+        public void Stop()
+        {
+            listenerLoopShutdown = true;
+            connectionWaitHandle.Set();
+            if (listenerLoopThread != null && listenerLoopThread.IsAlive)
+            {
+                listenerLoopThread.Join();
+            }
+        }
+
+        #endregion
+
+        #region properties
+
+        public List<HttpConnection> Connections { get; private set; }
+        public Dictionary<string, HttpSession> Sessions { get; private set; }
+        public string Root => root;
+        public int Port => port;
+        public string FavIcon { get; set; }
+        public HttpCache Cache { get; private set; }
+        public object UserData { get; }
+
+        #endregion
+
+        #region service
+
+        #region listners
+
+        private Thread listenerLoopThread;
+        private bool listenerLoopShutdown;
+
+        private void ListenerLoop()
+        {
+            Thread.Sleep(300);
+            listener = new TcpListener(IPAddress.Any, port);
+            listener.Start();
+
+            while (!listenerLoopShutdown)
+            {
+                try
+                {
+                    var result = listener.BeginAcceptTcpClient(AcceptTcpClientCallback, listener);
+                    connectionWaitHandle.WaitOne();
+                    connectionWaitHandle.Reset();
+                }
+                catch
+                {
+                    Thread.Sleep(5000);
+                }
+            }
+
+            // shutdown listner
+            if (listener != null)
+            {
+                listener.Stop();
+            }
+
+            listener = null;
+        }
+
+        private void AcceptTcpClientCallback(IAsyncResult ar)
+        {
+            try
+            {
+                var connection = (TcpListener) ar.AsyncState;
+                var client = connection.EndAcceptTcpClient(ar);
+
+                connectionWaitHandle.Set();
+
+                lock (Connections)
+                {
+                    Connections.Add(new HttpConnection(this, client));
+                    Connections.RemoveAll(c =>
+                    {
+                        if (c.Stopped)
+                        {
+                            c.Dispose();
+                            return true;
+                        }
+
+                        return false;
+                    });
+                }
+            }
+            catch
+            {
+                connectionWaitHandle.Set();
+            }
+        }
+
+        #endregion
+
+        #endregion
     }
 }
