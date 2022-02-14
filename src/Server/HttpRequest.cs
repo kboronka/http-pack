@@ -1,18 +1,3 @@
-/* Copyright (C) 2018 Kevin Boronka
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
-
 using System;
 using System.IO;
 using System.Net;
@@ -169,36 +154,19 @@ namespace HttpPack
 
         public byte[] ReadIncomingPacket(NetworkStream stream, TcpClient socket)
         {
-            try
+            if (socket == null || stream == null)
             {
-                if (socket == null || stream == null)
-                {
-                    return new byte[0] { };
-                }
+                return new byte[0] { };
+            }
 
-                lock (socket)
+            lock (socket)
+            {
+                if (socket.Available > 0 && stream.DataAvailable)
                 {
-                    if (socket.Available > 0 && stream.DataAvailable)
-                    {
-                        var packetBytes = new byte[socket.Available];
-                        stream.Read(packetBytes, 0, packetBytes.Length);
-                        return packetBytes;
-                    }
+                    var packetBytes = new byte[socket.Available];
+                    stream.Read(packetBytes, 0, packetBytes.Length);
+                    return packetBytes;
                 }
-            }
-            catch (ObjectDisposedException)
-            {
-                throw;
-                // The NetworkStream is closed.
-            }
-            catch (IOException)
-            {
-                throw;
-                // The underlying Socket is closed.
-            }
-            catch (SocketException)
-            {
-                throw;
             }
 
             return new byte[0] { };

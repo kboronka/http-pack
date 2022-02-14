@@ -1,5 +1,5 @@
 # http-pack
-A C# http library which includes a server, client along with json parsing tools, authorization tools, and other useful things.
+A C# http library which includes a light http server, http client along with json parsing tools, authorization tools, and other useful things.
 
 ## Example Server
 ```C#
