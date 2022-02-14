@@ -1,35 +1,34 @@
-﻿using HttpPack;
+﻿using HttpPack.Json;
 
-namespace example
+namespace Example;
+
+/// <summary>
+///     Description of Post.
+/// </summary>
+public class Post : IJsonObject
 {
-	/// <summary>
-	///     Description of Post.
-	/// </summary>
-	public class Post : IJsonObject
+    public Post(string title, string body, int userID)
     {
-        public Post(string title, string body, int userID)
-        {
-            Title = title;
-            Body = body;
-            UserID = userID;
-        }
+        Title = title;
+        Body = body;
+        UserID = userID;
+    }
 
-        public string Title { get; }
-        public string Body { get; }
-        public int UserID { get; }
+    public string Title { get; }
+    public string Body { get; }
+    public int UserID { get; }
 
-        public JsonKeyValuePairs KeyValuePairs
+    public JsonKeyValuePairs KeyValuePairs
+    {
+        get
         {
-            get
+            var kvp = new JsonKeyValuePairs
             {
-                var kvp = new JsonKeyValuePairs
-                {
-                    {"title", Title},
-                    {"body", Body},
-                    {"userId", UserID}
-                };
-                return kvp;
-            }
+                {"title", Title},
+                {"body", Body},
+                {"userId", UserID}
+            };
+            return kvp;
         }
     }
 }

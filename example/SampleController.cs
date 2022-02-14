@@ -1,21 +1,21 @@
-﻿using HttpPack;
+﻿using HttpPack.Json;
+using HttpPack.Server;
 
-namespace example
+namespace Example;
+
+[IsPrimaryController]
+[IsController]
+internal class SampleController
 {
-    [IsPrimaryController]
-    [IsController]
-    internal class SampleController
+    [IsPrimaryAction]
+    public static HttpContent JsonContentSample(HttpRequest request)
     {
-        [IsPrimaryAction]
-        public static HttpContent JsonContentSample(HttpRequest request)
+        var json = new JsonKeyValuePairs
         {
-            var json = new JsonKeyValuePairs
-            {
-                {"testString", "test"},
-                {"testInt", 1234}
-            };
+            {"testString", "test"},
+            {"testInt", 1234}
+        };
 
-            return new HttpJsonContent(json);
-        }
+        return new HttpJsonContent(json);
     }
 }

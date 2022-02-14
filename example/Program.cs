@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
-using HttpPack;
+using HttpPack.Server;
 
-namespace example;
+namespace Example;
 
 internal class Program
 {

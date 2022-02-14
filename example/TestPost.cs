@@ -1,7 +1,8 @@
 ﻿using System;
-using HttpPack;
+using HttpPack.Client;
+using HttpPack.Json;
 
-namespace example;
+namespace Example;
 
 public static class TestBasics
 {

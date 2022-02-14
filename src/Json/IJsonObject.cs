@@ -1,10 +1,9 @@
-﻿namespace HttpPack
+﻿namespace HttpPack.Json;
+
+/// <summary>
+///     Description of IJsonObject.
+/// </summary>
+public interface IJsonObject
 {
-	/// <summary>
-	///     Description of IJsonObject.
-	/// </summary>
-	public interface IJsonObject
-    {
-        JsonKeyValuePairs KeyValuePairs { get; }
-    }
+    JsonKeyValuePairs KeyValuePairs { get; }
 }

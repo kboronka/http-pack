@@ -1,107 +1,107 @@
 using System.Threading;
+using HttpPack.Json;
 
-namespace HttpPack.Fsm
+namespace HttpPack.FSM;
+
+/// <summary>
+///     Description of Message.
+/// </summary>
+public class Message<T>
 {
-    /// <summary>
-    ///     Description of Message.
-    /// </summary>
-    public class Message<T>
+    public delegate void MessageCallback(JsonKeyValuePairs kvp);
+
+    public delegate void MessageExpiredCallback(T payload);
+
+    private readonly object recivedLock = new();
+    private readonly int timeout;
+
+    private readonly Thread timeoutThread;
+
+    public Message(T payload)
     {
-        public delegate void MessageCallback(JsonKeyValuePairs kvp);
+        PayLoad = payload;
+    }
 
-        public delegate void MessageExpiredCallback(T payload);
+    public Message(T payload, MessageCallback responseCallback, int timeout, MessageExpiredCallback timeoutCallback)
+        : this(payload)
+    {
+        ResponseCallback = responseCallback;
+        TimeoutCallback = timeoutCallback;
+        this.timeout = timeout;
 
-        private readonly object recivedLock = new object();
-        private readonly int timeout;
-
-        private readonly Thread timeoutThread;
-
-        public Message(T payload)
+        timeoutThread = new Thread(TimeoutLoop)
         {
-            PayLoad = payload;
-        }
+            Name = "Message Timeout Thread",
+            IsBackground = true,
+            Priority = ThreadPriority.Lowest
+        };
+        timeoutThread.Start();
+    }
 
-        public Message(T payload, MessageCallback responseCallback, int timeout, MessageExpiredCallback timeoutCallback)
-            : this(payload)
+    public bool Sent { get; set; }
+    public bool Recived { get; set; }
+    public bool Expired { get; private set; }
+
+    public T PayLoad { get; set; }
+
+    public MessageCallback ResponseCallback { get; }
+    public MessageExpiredCallback TimeoutCallback { get; }
+
+    public void RequestSent()
+    {
+        Sent = true;
+    }
+
+    public void ResponseRecived(JsonKeyValuePairs kvp)
+    {
+        try
         {
-            ResponseCallback = responseCallback;
-            TimeoutCallback = timeoutCallback;
-            this.timeout = timeout;
+            Monitor.Enter(recivedLock);
 
-            timeoutThread = new Thread(TimeoutLoop)
+            Recived = true;
+
+            if (!Expired && ResponseCallback != null)
             {
-                Name = "Message Timeout Thread",
-                IsBackground = true,
-                Priority = ThreadPriority.Lowest
-            };
-            timeoutThread.Start();
-        }
-
-        public bool Sent { get; set; }
-        public bool Recived { get; set; }
-        public bool Expired { get; private set; }
-
-        public T PayLoad { get; set; }
-
-        public MessageCallback ResponseCallback { get; }
-        public MessageExpiredCallback TimeoutCallback { get; }
-
-        public void RequestSent()
-        {
-            Sent = true;
-        }
-
-        public void ResponseRecived(JsonKeyValuePairs kvp)
-        {
-            try
-            {
-                Monitor.Enter(recivedLock);
-
-                Recived = true;
-
-                if (!Expired && ResponseCallback != null)
-                {
-                    ResponseCallback(kvp);
-                }
-            }
-            finally
-            {
-                Monitor.Exit(recivedLock);
+                ResponseCallback(kvp);
             }
         }
-
-        private void TimeoutLoop()
+        finally
         {
-            var timeoutTimer = new Interval(timeout);
+            Monitor.Exit(recivedLock);
+        }
+    }
 
-            while (!Expired)
+    private void TimeoutLoop()
+    {
+        var timeoutTimer = new Interval(timeout);
+
+        while (!Expired)
+        {
+            Thread.Sleep(200);
+
+            if (Monitor.TryEnter(recivedLock, 500))
             {
-                Thread.Sleep(200);
-
-                if (Monitor.TryEnter(recivedLock, 500))
+                try
                 {
-                    try
+                    if (timeoutTimer.Ready)
                     {
-                        if (timeoutTimer.Ready)
-                        {
-                            Expired = true;
+                        Expired = true;
 
-                            if (!Recived && TimeoutCallback != null)
-                            {
-                                TimeoutCallback(PayLoad);
-                            }
+                        if (!Recived && TimeoutCallback != null)
+                        {
+                            TimeoutCallback(PayLoad);
                         }
                     }
-                    finally
-                    {
-                        Monitor.Exit(recivedLock);
-                    }
                 }
-                else
+                finally
                 {
-                    // The lock was not acquired.
-                    return;
+                    Monitor.Exit(recivedLock);
                 }
+            }
+            else
+            {
+                // The lock was not acquired.
+                return;
             }
         }
     }

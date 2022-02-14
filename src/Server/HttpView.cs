@@ -1,6 +1,5 @@
-namespace HttpPack
+namespace HttpPack.Server;
+
+public class HttpView
 {
-    public class HttpView
-    {
-    }
 }

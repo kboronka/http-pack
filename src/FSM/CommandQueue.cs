@@ -1,56 +1,55 @@
 using System;
 using System.Collections.Generic;
 
-namespace HttpPack.Fsm
+namespace HttpPack.FSM;
+
+/// <summary>
+///     Description of CommandQueue.
+/// </summary>
+public class CommandQueue
 {
-    /// <summary>
-    ///     Description of CommandQueue.
-    /// </summary>
-    public class CommandQueue
+    private readonly List<Command> commands;
+    private readonly object queueLock = new();
+
+    public CommandQueue()
     {
-        private readonly List<Command> commands;
-        private readonly object queueLock = new object();
-
-        public CommandQueue()
+        lock (queueLock)
         {
-            lock (queueLock)
-            {
-                commands = new List<Command>();
-            }
+            commands = new List<Command>();
         }
+    }
 
-        public bool Available => commands.Count > 0;
+    public bool Available => commands.Count > 0;
 
-        public void QueueCommand(Enum command)
+    public void QueueCommand(Enum command)
+    {
+        lock (queueLock)
         {
-            lock (queueLock)
-            {
-                commands.Add(new Command(command));
-            }
+            commands.Add(new Command(command));
         }
+    }
 
-        public void QueueCommand(Enum command, params object[] paramerters)
+    public void QueueCommand(Enum command, params object[] paramerters)
+    {
+        lock (queueLock)
         {
-            lock (queueLock)
-            {
-                commands.Add(new Command(command, paramerters));
-            }
+            commands.Add(new Command(command, paramerters));
         }
+    }
 
-        public Command DequeueCommand()
+    public Command DequeueCommand()
+    {
+        lock (queueLock)
         {
-            lock (queueLock)
+            if (commands.Count == 0)
             {
-                if (commands.Count == 0)
-                {
-                    return null;
-                }
-
-                var currentCommand = commands[0];
-                commands.RemoveAt(0);
-
-                return currentCommand;
+                return null;
             }
+
+            var currentCommand = commands[0];
+            commands.RemoveAt(0);
+
+            return currentCommand;
         }
     }
 }

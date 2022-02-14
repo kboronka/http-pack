@@ -1,300 +1,299 @@
 using System;
 using System.Collections.Generic;
 
-namespace HttpPack
+namespace HttpPack.Json;
+
+/// <summary>
+///     Dictionary extension object.
+/// </summary>
+public class JsonKeyValuePairs : Dictionary<string, object>
 {
-    /// <summary>
-    ///     Dictionary extension object.
-    /// </summary>
-    public class JsonKeyValuePairs : Dictionary<string, object>
+    public JsonKeyValuePairs()
     {
-        public JsonKeyValuePairs()
-        {
-        }
+    }
 
-        public JsonKeyValuePairs(Dictionary<string, object> dictionary)
+    public JsonKeyValuePairs(Dictionary<string, object> dictionary)
+    {
+        foreach (var key in dictionary.Keys)
         {
-            foreach (var key in dictionary.Keys)
+            base.Add(key, dictionary[key]);
+        }
+    }
+
+    public JsonKeyValuePairs(string json)
+    {
+        var depth = 0;
+        var stringDepth = 0;
+
+        var keyStart = -1;
+        var keyEnd = -1;
+        var key = "";
+
+        var valueStart = -1;
+        var valueEnd = -1;
+        var value = "";
+
+        for (var i = 0; i < json.Length; i++)
+        {
+            var c = json[i];
+
+            if (c == '{' && stringDepth == 0)
             {
-                base.Add(key, dictionary[key]);
+                depth++;
             }
-        }
-
-        public JsonKeyValuePairs(string json)
-        {
-            var depth = 0;
-            var stringDepth = 0;
-
-            var keyStart = -1;
-            var keyEnd = -1;
-            var key = "";
-
-            var valueStart = -1;
-            var valueEnd = -1;
-            var value = "";
-
-            for (var i = 0; i < json.Length; i++)
+            else if (c == '[' && depth > 0 && stringDepth == 0)
             {
-                var c = json[i];
+                depth++;
+            }
+            else if (c == ']' && depth > 0 && stringDepth == 0)
+            {
+                depth--;
+            }
+            else if (c == '"' && depth > 0 && stringDepth == 0)
+            {
+                stringDepth++;
 
-                if (c == '{' && stringDepth == 0)
+                if (keyStart == -1 && depth == 1)
                 {
-                    depth++;
+                    // start of key
+                    keyStart = i;
                 }
-                else if (c == '[' && depth > 0 && stringDepth == 0)
-                {
-                    depth++;
-                }
-                else if (c == ']' && depth > 0 && stringDepth == 0)
-                {
-                    depth--;
-                }
-                else if (c == '"' && depth > 0 && stringDepth == 0)
-                {
-                    stringDepth++;
+            }
+            else if (c == '"' && depth > 0 && stringDepth == 1)
+            {
+                stringDepth--;
 
-                    if (keyStart == -1 && depth == 1)
+                if (keyEnd == -1 && depth == 1)
+                {
+                    // end of a key
+                    keyEnd = i;
+                    key = json.Substring(keyStart + 1, keyEnd - keyStart - 1);
+                }
+            }
+            else if (c == ':' && stringDepth == 0)
+            {
+                if (valueStart == -1 && depth == 1)
+                {
+                    // start of value
+                    valueStart = i + 1;
+                }
+            }
+            else if (c == ',' && stringDepth == 0)
+            {
+                if (valueEnd == -1 && depth == 1)
+                {
+                    // end of value
+                    valueEnd = i - 1;
+                    value = json.Substring(valueStart, valueEnd - valueStart + 1);
+
+                    if (!ContainsKey(key))
                     {
-                        // start of key
-                        keyStart = i;
-                    }
-                }
-                else if (c == '"' && depth > 0 && stringDepth == 1)
-                {
-                    stringDepth--;
-
-                    if (keyEnd == -1 && depth == 1)
-                    {
-                        // end of a key
-                        keyEnd = i;
-                        key = json.Substring(keyStart + 1, keyEnd - keyStart - 1);
-                    }
-                }
-                else if (c == ':' && stringDepth == 0)
-                {
-                    if (valueStart == -1 && depth == 1)
-                    {
-                        // start of value
-                        valueStart = i + 1;
-                    }
-                }
-                else if (c == ',' && stringDepth == 0)
-                {
-                    if (valueEnd == -1 && depth == 1)
-                    {
-                        // end of value
-                        valueEnd = i - 1;
-                        value = json.Substring(valueStart, valueEnd - valueStart + 1);
-
-                        if (!ContainsKey(key))
-                        {
-                            Add(key, JsonHelper.ValueToObject(value));
-                        }
-
-                        // prep for next key
-                        keyStart = -1;
-                        keyEnd = -1;
-                        key = "";
-                        valueStart = -1;
-                        valueEnd = -1;
-                        value = "";
-                    }
-                }
-                else if (c == '}' && stringDepth == 0)
-                {
-                    if (depth == 1)
-                    {
-                        valueEnd = i - 1;
-                        value = json.Substring(valueStart, valueEnd - valueStart + 1);
-
                         Add(key, JsonHelper.ValueToObject(value));
                     }
 
-                    depth--;
+                    // prep for next key
+                    keyStart = -1;
+                    keyEnd = -1;
+                    key = "";
+                    valueStart = -1;
+                    valueEnd = -1;
+                    value = "";
                 }
             }
-
-            if (stringDepth != 0 && depth != 0)
+            else if (c == '}' && stringDepth == 0)
             {
-                throw new ApplicationException("Invalid json string");
-            }
-        }
-
-        public new void Add(string key, object value)
-        {
-            if (!ContainsKey(key))
-            {
-                base.Add(key, value);
-            }
-        }
-
-        public void AddRange(JsonKeyValuePairs kvp)
-        {
-            foreach (var key in kvp.Keys)
-            {
-                if (!ContainsKey(key))
+                if (depth == 1)
                 {
-                    base.Add(key, kvp[key]);
+                    valueEnd = i - 1;
+                    value = json.Substring(valueStart, valueEnd - valueStart + 1);
+
+                    Add(key, JsonHelper.ValueToObject(value));
                 }
+
+                depth--;
             }
         }
 
-        public void AddRange(IJsonObject jsonObject)
+        if (stringDepth != 0 && depth != 0)
         {
-            AddRange(jsonObject.KeyValuePairs);
+            throw new ApplicationException("Invalid json string");
         }
+    }
 
-        public bool ValidateStringKey(string key)
+    public new void Add(string key, object value)
+    {
+        if (!ContainsKey(key))
+        {
+            base.Add(key, value);
+        }
+    }
+
+    public void AddRange(JsonKeyValuePairs kvp)
+    {
+        foreach (var key in kvp.Keys)
         {
             if (!ContainsKey(key))
             {
-                return false;
-            }
-
-            return this[key] is string;
-        }
-
-        public void AssertStringKeyExists(string key)
-        {
-            if (!ValidateStringKey(key))
-            {
-                throw new JsonException(string.Format("Missing string Key: \"{0}\"", key));
+                base.Add(key, kvp[key]);
             }
         }
+    }
 
-        public void AssertKeyExists(string key)
+    public void AddRange(IJsonObject jsonObject)
+    {
+        AddRange(jsonObject.KeyValuePairs);
+    }
+
+    public bool ValidateStringKey(string key)
+    {
+        if (!ContainsKey(key))
         {
-            if (!ContainsKey(key))
-            {
-                throw new JsonException("Missing key: " + key);
-            }
+            return false;
         }
 
-        public bool ValidateKey(string key)
+        return this[key] is string;
+    }
+
+    public void AssertStringKeyExists(string key)
+    {
+        if (!ValidateStringKey(key))
         {
-            return ContainsKey(key);
+            throw new JsonException(string.Format("Missing string Key: \"{0}\"", key));
+        }
+    }
+
+    public void AssertKeyExists(string key)
+    {
+        if (!ContainsKey(key))
+        {
+            throw new JsonException("Missing key: " + key);
+        }
+    }
+
+    public bool ValidateKey(string key)
+    {
+        return ContainsKey(key);
+    }
+
+    public bool ValidateIntKey(string key)
+    {
+        if (!ContainsKey(key))
+        {
+            return false;
         }
 
-        public bool ValidateIntKey(string key)
-        {
-            if (!ContainsKey(key))
-            {
-                return false;
-            }
+        return this[key] is int;
+    }
 
-            return this[key] is int;
+    public void AssertIntKeyExists(string key)
+    {
+        if (!ValidateIntKey(key))
+        {
+            throw new JsonException(string.Format("Missing integer Key: \"{0}\"", key));
+        }
+    }
+
+    public bool ValidateJsonArrayKey(string key)
+    {
+        if (!ContainsKey(key))
+        {
+            return false;
         }
 
-        public void AssertIntKeyExists(string key)
+        return this[key] is JsonArray;
+    }
+
+    public void AssertJsonArrayKeyExists(string key)
+    {
+        if (!ValidateJsonArrayKey(key))
         {
-            if (!ValidateIntKey(key))
-            {
-                throw new JsonException(string.Format("Missing integer Key: \"{0}\"", key));
-            }
+            throw new JsonException(string.Format("Missing array Key: \"{0}\"", key));
+        }
+    }
+
+    public bool ValidateFloatKey(string key)
+    {
+        if (!ContainsKey(key))
+        {
+            return false;
         }
 
-        public bool ValidateJsonArrayKey(string key)
-        {
-            if (!ContainsKey(key))
-            {
-                return false;
-            }
+        return this[key] is float || this[key] is double || ValidateIntKey(key);
+    }
 
-            return this[key] is JsonArray;
+    public void AssertFloatKeyExists(string key)
+    {
+        if (!ValidateFloatKey(key))
+        {
+            throw new JsonException(string.Format("Missing float Key: \"{0}\"", key));
+        }
+    }
+
+    public bool ValidateBoolKey(string key)
+    {
+        if (!ContainsKey(key))
+        {
+            return false;
         }
 
-        public void AssertJsonArrayKeyExists(string key)
+        return this[key] is bool;
+    }
+
+    public void AssertBooleanKeyExists(string key)
+    {
+        if (!ValidateBoolKey(key))
         {
-            if (!ValidateJsonArrayKey(key))
-            {
-                throw new JsonException(string.Format("Missing array Key: \"{0}\"", key));
-            }
+            throw new JsonException(string.Format("Missing boolean Key: \"{0}\"", key));
+        }
+    }
+
+    public bool ValidateArrayKey(string key)
+    {
+        if (!ContainsKey(key))
+        {
+            return false;
         }
 
-        public bool ValidateFloatKey(string key)
-        {
-            if (!ContainsKey(key))
-            {
-                return false;
-            }
+        return this[key] is JsonArray;
+    }
 
-            return this[key] is float || this[key] is double || ValidateIntKey(key);
+    public void AssertArrayKeyExists(string key)
+    {
+        if (!ValidateArrayKey(key))
+        {
+            throw new JsonException(string.Format("Missing JsonArray Key: \"{0}\"", key));
+        }
+    }
+
+    public bool ValidateObjectKey(string key)
+    {
+        if (!ContainsKey(key))
+        {
+            return false;
         }
 
-        public void AssertFloatKeyExists(string key)
+        return this[key] is JsonKeyValuePairs;
+    }
+
+    public void AssertObjectKeyExists(string key)
+    {
+        if (!ValidateObjectKey(key))
         {
-            if (!ValidateFloatKey(key))
-            {
-                throw new JsonException(string.Format("Missing float Key: \"{0}\"", key));
-            }
+            throw new JsonException(string.Format("Missing JsonKeyValuePairs Key: \"{0}\"", key));
+        }
+    }
+
+    public override string ToString()
+    {
+        var text = "";
+        var delimitor = "";
+
+        foreach (var key in Keys)
+        {
+            text += delimitor + key;
+            delimitor = ", ";
         }
 
-        public bool ValidateBoolKey(string key)
-        {
-            if (!ContainsKey(key))
-            {
-                return false;
-            }
-
-            return this[key] is bool;
-        }
-
-        public void AssertBooleanKeyExists(string key)
-        {
-            if (!ValidateBoolKey(key))
-            {
-                throw new JsonException(string.Format("Missing boolean Key: \"{0}\"", key));
-            }
-        }
-
-        public bool ValidateArrayKey(string key)
-        {
-            if (!ContainsKey(key))
-            {
-                return false;
-            }
-
-            return this[key] is JsonArray;
-        }
-
-        public void AssertArrayKeyExists(string key)
-        {
-            if (!ValidateArrayKey(key))
-            {
-                throw new JsonException(string.Format("Missing JsonArray Key: \"{0}\"", key));
-            }
-        }
-
-        public bool ValidateObjectKey(string key)
-        {
-            if (!ContainsKey(key))
-            {
-                return false;
-            }
-
-            return this[key] is JsonKeyValuePairs;
-        }
-
-        public void AssertObjectKeyExists(string key)
-        {
-            if (!ValidateObjectKey(key))
-            {
-                throw new JsonException(string.Format("Missing JsonKeyValuePairs Key: \"{0}\"", key));
-            }
-        }
-
-        public override string ToString()
-        {
-            var text = "";
-            var delimitor = "";
-
-            foreach (var key in Keys)
-            {
-                text += delimitor + key;
-                delimitor = ", ";
-            }
-
-            return "[" + text + "]";
-        }
+        return "[" + text + "]";
     }
 }

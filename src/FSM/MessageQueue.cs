@@ -1,70 +1,69 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HttpPack.Fsm
+namespace HttpPack.FSM;
+
+/// <summary>
+///     Description of MessageFIFO.
+/// </summary>
+public class MessageQueue<T>
 {
-    /// <summary>
-    ///     Description of MessageFIFO.
-    /// </summary>
-    public class MessageQueue<T>
+    private readonly object queueLock = new();
+
+    public MessageQueue()
     {
-        private readonly object queueLock = new object();
-
-        public MessageQueue()
+        lock (queueLock)
         {
-            lock (queueLock)
-            {
-                Messages = new List<Message<T>>();
-            }
+            Messages = new List<Message<T>>();
         }
+    }
 
-        public bool Available
+    public bool Available
+    {
+        get { return Messages.Any(m => !m.Sent); }
+    }
+
+    public List<Message<T>> Messages { get; }
+
+    public void QueueItem(T message)
+    {
+        lock (queueLock)
         {
-            get { return Messages.Any(m => !m.Sent); }
+            Messages.Add(new Message<T>(message));
         }
+    }
 
-        public List<Message<T>> Messages { get; }
-
-        public void QueueItem(T message)
+    public void QueueItem(T message, Message<T>.MessageCallback responseCallback, int timeout,
+        Message<T>.MessageExpiredCallback timeoutCallback)
+    {
+        lock (queueLock)
         {
-            lock (queueLock)
-            {
-                Messages.Add(new Message<T>(message));
-            }
+            Messages.Add(new Message<T>(message, responseCallback, timeout, timeoutCallback));
         }
+    }
 
-        public void QueueItem(T message, Message<T>.MessageCallback responseCallback, int timeout,
-            Message<T>.MessageExpiredCallback timeoutCallback)
+    public T DequeueItem()
+    {
+        lock (queueLock)
         {
-            lock (queueLock)
+            foreach (var message in Messages)
             {
-                Messages.Add(new Message<T>(message, responseCallback, timeout, timeoutCallback));
-            }
-        }
-
-        public T DequeueItem()
-        {
-            lock (queueLock)
-            {
-                foreach (var message in Messages)
+                if (!message.Sent)
                 {
-                    if (!message.Sent)
-                    {
-                        message.Sent = true;
-                        return message.PayLoad;
-                    }
+                    message.Sent = true;
+                    return message.PayLoad;
                 }
             }
-
-            return default;
         }
 
-        public void Cleanup()
+        return default;
+    }
+
+    public void Cleanup()
+    {
+        lock (queueLock)
         {
-            lock (queueLock)
-            {
-                Messages.RemoveAll(m => m.Recived || m.Expired);
-            }
+            Messages.RemoveAll(m => m.Recived || m.Expired);
         }
     }
 }

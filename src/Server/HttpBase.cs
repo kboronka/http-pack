@@ -1,6 +1,5 @@
-namespace HttpPack
+namespace HttpPack.Server;
+
+public class HttpBase
 {
-    public class HttpBase
-    {
-    }
 }
