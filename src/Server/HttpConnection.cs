@@ -16,10 +16,9 @@ public class HttpConnection : IDisposable
 #endif
 
     private readonly Thread serviceRequestThread;
-    private readonly Thread timeoutMonitorThread;
     private readonly Interval timeout;
 
-    public bool Open { get; private set; }
+    private bool Open { get; set; }
     public bool Stopped { get; private set; }
 
     public HttpServer Parent { get; }
@@ -44,7 +43,7 @@ public class HttpConnection : IDisposable
         };
         serviceRequestThread.Start();
 
-        timeoutMonitorThread = new Thread(ServiceRequests)
+        var timeoutMonitorThread = new Thread(ServiceRequests)
         {
             Name = "HttpConnection Timeout Monitor " + clientIp,
             Priority = ThreadPriority.Lowest,
@@ -65,7 +64,7 @@ public class HttpConnection : IDisposable
 
     private bool disposed;
 
-    protected void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
         if (disposed)
         {

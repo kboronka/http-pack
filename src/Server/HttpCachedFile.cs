@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -9,11 +10,9 @@ namespace HttpPack.Server;
 
 public class HttpCachedFile
 {
+    private readonly string path;
     private readonly FileSystemWatcher watcher;
-
-    protected bool embedded;
-    protected string path;
-    public DateTime LastModified { get; protected set; }
+    public DateTime LastModified { get; private set; }
     public string ContentType { get; }
     public string ETag { get; private set; }
     public byte[] Data { get; private set; }
@@ -38,25 +37,16 @@ public class HttpCachedFile
     private static string GetETag(byte[] data)
     {
         var hash = new MD5CryptoServiceProvider().ComputeHash(data);
-        var hex = "";
+        var hex = hash.Aggregate("", (current, b) => current + b.ToString("X2"));
 
-        foreach (var b in hash)
-        {
-            hex += b.ToString("X2");
-        }
-
-        return @""" + hex + @""";
+        return $"\"{hex}\"";
     }
 
     private static byte[] ReadAllBytes(string path)
     {
-        byte[] buffer;
-
-        using (var fs = WaitForFile(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-        {
-            buffer = new byte[fs.Length];
-            fs.Read(buffer, 0, (int) fs.Length);
-        }
+        using var fs = WaitForFile(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        var buffer = new byte[fs.Length];
+        fs.Read(buffer, 0, (int) fs.Length);
 
         return buffer;
     }
@@ -86,10 +76,9 @@ public class HttpCachedFile
 
     #region constructors
 
-    protected HttpCachedFile(string path, byte[] data)
+    private HttpCachedFile(string path, byte[] data)
     {
         this.path = path;
-        embedded = true;
 
         var extension = Path.GetExtension(path).ToLower();
         ContentType = HttpMimeTypes.GetMimeType(extension);
