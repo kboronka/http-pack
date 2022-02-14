@@ -8,7 +8,7 @@ internal class Program
 {
     public static void Main()
     {
-        TestTLS.TLS11();
+        TestTls.Tls11();
         TestBasics.Basics();
         Console.WriteLine();
 

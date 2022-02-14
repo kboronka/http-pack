@@ -4,25 +4,25 @@ using HttpPack.Json;
 
 namespace Example;
 
-public static class TestTLS
+public static class TestTls
 {
-    public static bool TLS11()
+    public static bool Tls11()
     {
-        var uri = "https://www.howsmyssl.com/a/check";
+        const string uri = "https://www.howsmyssl.com/a/check";
 
         var client = new HttpClient<JsonKeyValuePairs>();
         var res = client.Get(uri, "");
 
-        if (res.Code == 200)
+        if (res.Code != 200)
         {
-            Console.WriteLine("TLS Test -- " + uri);
-            Console.WriteLine("  TLS version: " + res.Body["tls_version"]);
-            Console.WriteLine("  rating: " + res.Body["rating"]);
-            Console.WriteLine();
-
-            return true;
+            return false;
         }
 
-        return false;
+        Console.WriteLine("TLS Test -- " + uri);
+        Console.WriteLine("  TLS version: " + res.Body["tls_version"]);
+        Console.WriteLine("  rating: " + res.Body["rating"]);
+        Console.WriteLine();
+
+        return true;
     }
 }
