@@ -10,9 +10,9 @@ namespace HttpPack.Server;
 public class HttpConnection : IDisposable
 {
 #if DEBUG
-    public const int MAX_TIME = 3;
+    public const int MaxTime = 3;
 #else
-		public const int MAX_TIME = 300;
+		public const int MaxTime = 300;
 #endif
 
     private readonly Thread serviceRequestThread;
@@ -33,7 +33,7 @@ public class HttpConnection : IDisposable
 
         Parent = parent;
 
-        timeout = new Interval((MAX_TIME + 20) * 1000);
+        timeout = new Interval((MaxTime + 20) * 1000);
         var clientIp = ((IPEndPoint) socket.Client.RemoteEndPoint).Address.ToString();
 
         serviceRequestThread = new Thread(MonitorTimeout)

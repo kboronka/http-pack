@@ -132,7 +132,7 @@ public class HttpResponse
              */
 
             // keep-alive
-            response += "Keep-Alive: timeout=" + HttpConnection.MAX_TIME + eol;
+            response += "Keep-Alive: timeout=" + HttpConnection.MaxTime + eol;
             response += "Connection: keep-alive";
             response += eol + eol;
         }
