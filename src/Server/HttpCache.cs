@@ -91,7 +91,7 @@ public class HttpCache
         throw new FileNotFoundException(filePath);
     }
 
-    public static List<string> GetAllFiles(string root)
+    private static List<string> GetAllFiles(string root)
     {
         if (string.IsNullOrEmpty(root))
         {
@@ -100,7 +100,7 @@ public class HttpCache
 
         var pattern = "*.*";
 
-        // handle filepaths in root
+        // handle file paths in root
         if (!Directory.Exists(root) && root.Contains("*"))
         {
             pattern = root.Substring(root.LastIndexOf('\\') + 1);
@@ -122,6 +122,7 @@ public class HttpCache
             }
             catch
             {
+                // ignore folders without permissions
             }
         }
 
