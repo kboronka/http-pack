@@ -1,16 +1,13 @@
-﻿using System;
-
-namespace HttpPack
+﻿namespace HttpPack.Auth
 {
-	/// <summary>
-	/// Description of JwtValidationFailedException.
-	/// </summary>
-	public class JwtDecodingException : JsonException
-	{
-		public JwtDecodingException(string message)
-			: base(message)
-		{
-			
-		}
-	}
+    /// <summary>
+    ///     Description of JwtValidationFailedException.
+    /// </summary>
+    public class JwtDecodingException : JsonException
+    {
+        public JwtDecodingException(string message)
+            : base(message)
+        {
+        }
+    }
 }
