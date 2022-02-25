@@ -21,7 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\src\HttpPack.csproj" />
+      <ProjectReference Include="..\HttpPack\HttpPack.csproj" />
     </ItemGroup>
 
 </Project>
