@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace HttpPack.FSM;
+namespace HttpPack.FiniteStateMachine;
 
 /// <summary>
 ///     Description of CommandQueue.

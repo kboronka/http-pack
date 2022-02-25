@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HttpPack.FSM;
+namespace HttpPack.FiniteStateMachine;
 
 /// <summary>
 ///     Description of MessageFIFO.

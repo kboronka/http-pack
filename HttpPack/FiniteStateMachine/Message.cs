@@ -1,7 +1,7 @@
 using System.Threading;
 using HttpPack.Json;
 
-namespace HttpPack.FSM;
+namespace HttpPack.FiniteStateMachine;
 
 /// <summary>
 ///     Description of Message.

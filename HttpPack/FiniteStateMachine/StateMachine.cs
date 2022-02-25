@@ -1,6 +1,6 @@
 using System.Threading;
 
-namespace HttpPack.FSM;
+namespace HttpPack.FiniteStateMachine;
 
 /// <summary>
 ///     Description of StateMachine.

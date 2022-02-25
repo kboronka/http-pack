@@ -1,6 +1,6 @@
 using System;
 
-namespace HttpPack.FSM;
+namespace HttpPack.FiniteStateMachine;
 
 /// <summary>
 ///     Description of Command.

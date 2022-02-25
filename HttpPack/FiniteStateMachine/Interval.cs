@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 
-namespace HttpPack.FSM;
+namespace HttpPack.FiniteStateMachine;
 
 public class Interval
 {

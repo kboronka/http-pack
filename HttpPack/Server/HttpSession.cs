@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using HttpPack.FSM;
+using HttpPack.FiniteStateMachine;
 
 namespace HttpPack.Server;
 
