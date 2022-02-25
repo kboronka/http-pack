@@ -8,8 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\HttpPack\HttpPack.csproj" />
-        <ProjectReference Include="..\src\HttpPack.csproj" />
+      <ProjectReference Include="..\HttpPack\HttpPack.csproj" />
     </ItemGroup>
 
 </Project>
