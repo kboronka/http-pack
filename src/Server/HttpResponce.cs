@@ -108,7 +108,7 @@ public class HttpResponse
 
         if (!request.IsWebSocket)
         {
-            response += @"Server: " + @"http-pack" + eol;
+            response += @"Server: " + @"HttpPack" + eol;
             response += @"Date: " + DateTime.UtcNow.ToString(GMT) + eol;
             response += @"ETag: " + content.ETag + eol;
             response += @"Set-Cookie: sarSession=" + request.Session.ID + @"; Path=/; expires=" +
